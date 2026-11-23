@@ -52,7 +52,8 @@
     "externalContent": "embeds images previews",
     "fileSharing": "files send receive download save folder attachment zip",
     "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card",
-    "camera": "webcam video background blur virtual background mirror self-view"
+    "camera": "webcam video background blur virtual background mirror self-view",
+    "localMutes": "mute local mute forget startup start"
   },
   "search": {
     "label": "Search settings",
@@ -70,7 +71,8 @@
     "invalidInput": "That did not work: the file or password is not valid.",
     "duplicateIdentity": "This identity is already in your list.",
     "notFound": "The file or item could not be found.",
-    "generic": "Something went wrong. Please try again."
+    "generic": "Something went wrong. Please try again.",
+    "wrongPassword": "The password is not correct. Check it and try again."
   },
   "identity": {
     "export": "Export…",
@@ -899,6 +901,11 @@
     "revokeLabel": "Revoke the accepted conversation with {{name}}",
     "revokeFailed": "Revoking failed. Please try again."
   },
+  "localMutes": {
+    "title": "Local mutes",
+    "switch": "Forget local mutes when Mumcord starts",
+    "hint": "People you muted only for yourself become audible again after a restart. Volumes and blocked users are kept."
+  },
   "blocked": {
     "title": "Blocked users",
     "hint": "Blocks are kept on this computer only. Blocked users are muted for you and their messages and Mumcord data are ignored.",
@@ -950,7 +957,10 @@
     "channel": "Update channel",
     "channelHint": "Choose which releases Mumcord offers. Release candidates are early builds of the next version.",
     "channels": {
-      "stable": { "name": "Stable", "hint": "Final releases only" },
+      "stable": {
+        "name": "Stable",
+        "hint": "Final releases only"
+      },
       "releaseCandidates": {
         "name": "Release candidates",
         "hint": "Early builds of the next version; may contain bugs"

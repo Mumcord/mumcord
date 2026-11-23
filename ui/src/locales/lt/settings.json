@@ -48,6 +48,7 @@
     "updates": "nauja versija naujinys atnaujinimas",
     "storage": "disko vieta išvalyti talpyklą",
     "blocked": "ignoruoti blokuoti nutildyti žmones",
+    "localMutes": "nutildyti nutildymas nutildytas pamiršti paleidimas",
     "notifications": "įspėjimai iššokantys langai",
     "externalContent": "įterpiniai paveikslėliai peržiūros",
     "fileSharing": "failai siųsti gauti atsisiųsti išsaugoti aplankas priedas zip",
@@ -74,7 +75,8 @@
     "invalidInput": "Nepavyko: failas arba slaptažodis netinkamas.",
     "duplicateIdentity": "Ši tapatybė jau yra tavo sąraše.",
     "notFound": "Failo ar elemento nepavyko rasti.",
-    "generic": "Kažkas nepavyko. Bandyk dar kartą."
+    "generic": "Kažkas nepavyko. Bandyk dar kartą.",
+    "wrongPassword": "Slaptažodis neteisingas. Patikrinkite jį ir bandykite dar kartą."
   },
   "identity": {
     "export": "Eksportuoti…",
@@ -911,6 +913,11 @@
     "revokeLabel": "Atšaukti priimtą pokalbį su {{name}}",
     "revokeFailed": "Atšaukti nepavyko. Bandyk dar kartą."
   },
+  "localMutes": {
+    "title": "Vietiniai nutildymai",
+    "switch": "Pamiršti vietinius nutildymus paleidžiant Mumcord",
+    "hint": "Žmonės, kuriuos nutildei tik sau, po paleidimo vėl bus girdimi. Garsiai ir užblokuoti naudotojai išlieka."
+  },
   "blocked": {
     "title": "Užblokuoti naudotojai",
     "hint": "Blokavimai saugomi tik šiame kompiuteryje. Užblokuoti naudotojai tau nutildyti, o jų žinutės ir Mumcord duomenys ignoruojami.",
@@ -962,7 +969,10 @@
     "channel": "Naujinių kanalas",
     "channelHint": "Pasirink, kokias versijas siūlo Mumcord. Išleidimo kandidatai yra ankstyvos kitos versijos darinys.",
     "channels": {
-      "stable": { "name": "Stabili", "hint": "Tik galutinės versijos" },
+      "stable": {
+        "name": "Stabili",
+        "hint": "Tik galutinės versijos"
+      },
       "releaseCandidates": {
         "name": "Išleidimo kandidatai",
         "hint": "Ankstyvos kitos versijos darinys; gali būti klaidų"

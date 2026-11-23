@@ -52,7 +52,8 @@
     "externalContent": "upotukset kuvat esikatselut",
     "fileSharing": "tiedostot lähetä vastaanota lataa tallenna kansio liite zip",
     "screenSharing": "näytön jakaminen laatu tarkkuus fps koodekki AV1 VP9 enkooderi näytönohjain",
-    "camera": "kamera web-kamera video tausta sumennus virtuaalitausta peilaus omakuva"
+    "camera": "kamera web-kamera video tausta sumennus virtuaalitausta peilaus omakuva",
+    "localMutes": "mykistä mykistetty unohda käynnistys"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -70,7 +71,8 @@
     "invalidInput": "Se ei onnistunut: tiedosto tai salasana ei kelpaa.",
     "duplicateIdentity": "Tämä identiteetti on jo listallasi.",
     "notFound": "Tiedostoa tai kohdetta ei löytynyt.",
-    "generic": "Jokin meni pieleen. Yritä uudelleen."
+    "generic": "Jokin meni pieleen. Yritä uudelleen.",
+    "wrongPassword": "Salasana ei ole oikein. Tarkista se ja yritä uudelleen."
   },
   "identity": {
     "export": "Vie…",
@@ -899,6 +901,11 @@
     "revokeLabel": "Peru hyväksytty keskustelu käyttäjän {{name}} kanssa",
     "revokeFailed": "Peruminen epäonnistui. Yritä uudelleen."
   },
+  "localMutes": {
+    "title": "Mykistetty sinulle",
+    "switch": "Unohda sinulle mykistetyt henkilöt, kun Mumcord käynnistyy",
+    "hint": "Henkilöt, jotka mykistit vain itsellesi, ovat uudelleenkäynnistyksen jälkeen taas kuultavissa. Äänenvoimakkuudet ja estetyt käyttäjät säilyvät."
+  },
   "blocked": {
     "title": "Estetyt käyttäjät",
     "hint": "Estot tallennetaan vain tälle tietokoneelle. Estetyt käyttäjät on mykistetty sinun osaltasi, ja heidän viestinsä ja Mumcord-datansa ohitetaan.",
@@ -950,7 +957,10 @@
     "channel": "Päivityskanava",
     "channelHint": "Valitse, mitä julkaisuja Mumcord tarjoaa. Julkaisuehdokkaat ovat seuraavan version varhaisia versioita.",
     "channels": {
-      "stable": { "name": "Vakaa", "hint": "Vain lopulliset julkaisut" },
+      "stable": {
+        "name": "Vakaa",
+        "hint": "Vain lopulliset julkaisut"
+      },
       "releaseCandidates": {
         "name": "Julkaisuehdokkaat",
         "hint": "Seuraavan version varhaisia versioita; voivat sisältää virheitä"

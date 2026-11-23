@@ -79,7 +79,8 @@
     "importInvalid": "Filen kunne ikke åbnes. Tjek adgangskoden, og at det er en .p12- eller .pfx-identitetsfil.",
     "importNotFound": "Filen blev ikke fundet. Vælg den igen.",
     "importIo": "Filen kunne ikke læses. Vælg den igen.",
-    "pickFailed": "Filvælgeren kunne ikke åbnes."
+    "pickFailed": "Filvælgeren kunne ikke åbnes.",
+    "importWrongPassword": "Adgangskoden er forkert. Tjek den, og prøv igen."
   },
   "mic": {
     "input": "Mikrofon",

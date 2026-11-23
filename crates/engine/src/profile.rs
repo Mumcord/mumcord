@@ -92,13 +92,18 @@ async fn encode_avatar_file(path: PathBuf, limit: usize) -> EngineResult<(Vec<u8
         let bytes = std::fs::read(&path).map_err(|e| {
             EngineError::new(ErrorKind::Io, format!("reading the image failed: {e}"))
         })?;
-        Ok((
-            encode_avatar(&bytes, limit)?,
-            encode_avatar(&bytes, usize::MAX)?,
-        ))
+        encode_avatar_pair(&bytes, limit)
     })
     .await
     .map_err(|e| EngineError::internal(e.to_string()))?
+}
+
+/// The avatar for the server (within `limit`) and the copy to keep for later connects.
+fn encode_avatar_pair(bytes: &[u8], limit: usize) -> EngineResult<(Vec<u8>, Vec<u8>)> {
+    Ok((
+        encode_avatar(bytes, limit)?,
+        encode_avatar(bytes, usize::MAX)?,
+    ))
 }
 
 /// Sends `texture` as the own avatar (empty removes it) and waits for the server's answer.
@@ -363,6 +368,30 @@ impl Engine {
         Ok(())
     }
 
+    /// [`Self::set_own_avatar`] from image bytes instead of a file (the phone apps get the
+    /// picked image as bytes and keep no temporary file); `None` removes the avatar.
+    pub async fn set_own_avatar_bytes(
+        &self,
+        server_id: ServerId,
+        image: Option<Vec<u8>>,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let (texture, keep) = match image {
+            None => (Vec::new(), None),
+            Some(bytes) => {
+                let limit = image_limit(&ctx);
+                let (texture, keep) =
+                    tokio::task::spawn_blocking(move || encode_avatar_pair(&bytes, limit))
+                        .await
+                        .map_err(|e| EngineError::internal(e.to_string()))??;
+                (texture, Some(keep))
+            }
+        };
+        apply_texture(&ctx, texture).await?;
+        remember_avatar(&ctx, keep.as_deref());
+        Ok(())
+    }
+
     /// Sets the own profile comment (Mumble HTML); empty removes it.
     pub async fn set_own_comment(&self, server_id: ServerId, html: String) -> EngineResult<()> {
         let ctx = self.session_ctx_for(server_id)?;
@@ -530,6 +559,19 @@ mod tests {
             ErrorKind::InvalidInput
         );
         assert!(!file.exists(), "a failed set keeps the previous state");
+    }
+
+    #[test]
+    fn avatar_bytes_give_the_server_copy_within_its_limit_and_a_full_copy_to_keep() {
+        let (texture, keep) = encode_avatar_pair(&noisy_png(300, 300), 6_000).expect("encode");
+        assert!(texture.len() <= 6_000);
+        assert!(keep.starts_with(b"\x89PNG"), "the kept copy is not limited");
+        assert_eq!(
+            encode_avatar_pair(b"not an image", 6_000)
+                .expect_err("invalid")
+                .kind,
+            ErrorKind::InvalidInput
+        );
     }
 
     #[test]

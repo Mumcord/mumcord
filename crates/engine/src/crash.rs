@@ -8,6 +8,11 @@
 //!
 //! A window that stops answering is reported too ([`report_freeze`], Linux only so far): the run
 //! goes on, and the report holds the stacks of all threads so the hang can be found.
+//!
+//! The phone apps record their own crashes (a Kotlin or Swift exception) with
+//! [`record_foreign`], name their private app folders at [`install`] so they are shortened like
+//! the home folder, and keep only the newest "unexpected exit": phones end apps in the background
+//! routinely, and those reports would push real crashes out of the [`MAX_REPORTS`].
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -54,6 +59,9 @@ pub enum CrashKind {
     /// The window stopped answering for a while. Not fatal: the run went on, and the report
     /// holds the stacks of all threads at that moment (`report_freeze`).
     Freeze,
+    /// An exception of the app around the engine (Kotlin, Swift), recorded by the app itself
+    /// with [`record_foreign`].
+    Foreign,
 }
 
 impl CrashKind {
@@ -64,6 +72,7 @@ impl CrashKind {
             Self::Unexpected => "unexpected exit".to_owned(),
             Self::Overrun => "real-time overrun".to_owned(),
             Self::Freeze => "freeze".to_owned(),
+            Self::Foreign => "foreign exception".to_owned(),
         }
     }
 
@@ -73,6 +82,7 @@ impl CrashKind {
             "unexpected exit" => Self::Unexpected,
             "real-time overrun" => Self::Overrun,
             "freeze" => Self::Freeze,
+            "foreign exception" => Self::Foreign,
             other => Self::Signal(other.trim_start_matches("signal ").to_owned()),
         }
     }
@@ -99,6 +109,12 @@ struct State {
 }
 
 static STATE: OnceLock<State> = OnceLock::new();
+/// Private folders shortened in reports besides the home folder, longest first (see [`install`]).
+static PRIVATE_ROOTS: OnceLock<Vec<String>> = OnceLock::new();
+/// Phones end apps in the background without a trace; see [`drop_unexpected_reports`].
+const PHONE: bool = cfg!(any(target_os = "android", target_os = "ios"));
+/// Largest stack text [`record_foreign`] keeps, in bytes.
+const MAX_FOREIGN_STACK: usize = 64 * 1024;
 /// Gathered once in the background at start, so a panic report needs no tools of its own.
 static SYSTEM: OnceLock<Vec<String>> = OnceLock::new();
 
@@ -164,7 +180,11 @@ fn system_lines() -> &'static [String] {
 
 /// Sets up crash reporting for this run: records a report for an unclean previous run, installs
 /// the panic hook and the native signal handler, and leaves a marker until [`clean_exit`].
-pub fn install(dir: &Path, version: &str) -> io::Result<()> {
+/// `private_roots` are folders of the app that name the user or the device (an Android app's data
+/// folders); reports show them as `<private>`, like the home folder as `~`. The desktop passes
+/// none.
+pub fn install(dir: &Path, version: &str, private_roots: &[PathBuf]) -> io::Result<()> {
+    let _ = PRIVATE_ROOTS.set(roots_to_shorten(private_roots));
     fs::create_dir_all(dir)?;
     let marker = dir.join(MARKER);
     let left = fs::read_to_string(&marker).ok();
@@ -220,6 +240,9 @@ pub fn install(dir: &Path, version: &str) -> io::Result<()> {
                         .then(|| exit_reason::ended_by(previous_run.as_ref()));
                     #[cfg(not(target_os = "linux"))]
                     let ended_by: Option<String> = None;
+                    if PHONE && kind == CrashKind::Unexpected {
+                        drop_unexpected_reports(&dir);
+                    }
                     let report = Report {
                         kind,
                         thread: &thread,
@@ -475,12 +498,133 @@ fn utc(secs: u64) -> String {
     format!("{year:04}-{month:02}-{day:02} {hour:02}:{minute:02} UTC")
 }
 
-/// Replaces the home folder with `~`, so user names in paths stay out of reports.
+/// The private folders to shorten, longest first so a folder inside another one goes first. The
+/// root folder and empty paths are left out: replacing `/` would mangle every path.
+fn roots_to_shorten(roots: &[PathBuf]) -> Vec<String> {
+    let mut roots: Vec<String> = roots
+        .iter()
+        .map(|root| root.to_string_lossy().trim_end_matches('/').to_owned())
+        .filter(|root| !root.is_empty())
+        .collect();
+    roots.sort_by_key(|root| std::cmp::Reverse(root.len()));
+    roots.dedup();
+    roots
+}
+
+/// Replaces the app's private folders with `<private>` and the home folder with `~`, so user
+/// names and app data paths stay out of reports.
 fn shorten_home(text: &str) -> String {
-    match std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE")) {
-        Some(home) if !home.is_empty() => text.replace(&*home.to_string_lossy(), "~"),
-        _ => text.to_owned(),
+    let home = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"));
+    shorten(
+        text,
+        PRIVATE_ROOTS.get().map_or(&[], Vec::as_slice),
+        home.as_deref().map(|h| h.to_string_lossy()).as_deref(),
+    )
+}
+
+fn shorten(text: &str, roots: &[String], home: Option<&str>) -> String {
+    let mut text = text.to_owned();
+    for root in roots {
+        text = text.replace(root.as_str(), "<private>");
     }
+    // Android apps run with `HOME=/`: that names nobody, and replacing it would mangle every path.
+    match home.map(|h| h.trim_end_matches(['/', '\\'])) {
+        Some(home) if !home.is_empty() => text.replace(home, "~"),
+        _ => text,
+    }
+}
+
+/// Removes the saved "unexpected exit" reports. Phones keep only the newest one: they end apps in
+/// the background routinely, and a report for each would push real crashes out of the
+/// [`MAX_REPORTS`].
+fn drop_unexpected_reports(dir: &Path) {
+    for path in report_files(dir) {
+        if summary(&path).is_some_and(|s| s.kind == CrashKind::Unexpected)
+            && let Err(e) = fs::remove_file(&path)
+        {
+            tracing::warn!(error = %e, "an old unexpected-exit report could not be removed");
+        }
+    }
+}
+
+/// Records an exception of the app around the engine (a Kotlin or Swift crash) as a report of
+/// kind [`CrashKind::Foreign`], written before this returns, so the app can call it from its
+/// uncaught-exception handler right before the process ends. Exception messages can carry user
+/// data (names, paths, server addresses), so only the exception types stay: `cause`, the first
+/// stack line and every `Caused by:` / `Suppressed:` line lose the text after the first `": "`,
+/// and other lines that are not frames (multi-line messages) are dropped. The stack is cut to
+/// 64 KiB; private folders are shortened as in every report. Fails when [`install`] has not run.
+pub fn record_foreign(cause: &str, stack: &str) -> io::Result<PathBuf> {
+    let state = STATE
+        .get()
+        .ok_or_else(|| io::Error::other("crash reports are not set up"))?;
+    let cause = exception_type(cause.lines().next().unwrap_or_default());
+    let stack = foreign_stack(stack);
+    let log = diag::recent_log_lines();
+    let context = context_now();
+    let report = Report {
+        kind: CrashKind::Foreign,
+        thread: "-",
+        cause: &cause,
+        backtrace: &stack,
+        log: &log,
+        context: &context,
+        uptime_secs: Some(state.started.elapsed().as_secs()),
+        ended_by: None,
+    };
+    let path = write_report(&state.dir, &state.version, &report)?;
+    prune(&state.dir)?;
+    Ok(path)
+}
+
+/// The exception type of a `Type: message` line, without the message.
+fn exception_type(line: &str) -> String {
+    let line = line.trim();
+    line.split_once(": ")
+        .map_or(line, |(kind, _)| kind)
+        .to_owned()
+}
+
+/// The stack without exception messages and within [`MAX_FOREIGN_STACK`].
+fn foreign_stack(stack: &str) -> String {
+    let mut out = String::new();
+    for (i, line) in stack.lines().enumerate() {
+        let indent = &line[..line.len() - line.trim_start().len()];
+        let trimmed = line.trim_start();
+        let header = ["Caused by: ", "Suppressed: "]
+            .iter()
+            .find_map(|prefix| trimmed.strip_prefix(prefix).map(|rest| (*prefix, rest)));
+        let kept = if is_frame(trimmed) {
+            line.to_owned()
+        } else if let Some((prefix, rest)) = header {
+            format!("{indent}{prefix}{}", exception_type(rest))
+        } else if i == 0 {
+            exception_type(trimmed)
+        } else {
+            // Any other line continues a multi-line exception message, which may carry user data.
+            continue;
+        };
+        if out.len() + kept.len() + 1 > MAX_FOREIGN_STACK {
+            out.push_str("[stack cut]\n");
+            break;
+        }
+        out.push_str(&kept);
+        out.push('\n');
+    }
+    out
+}
+
+/// A stack frame of a JVM trace (`at …`, `... 3 more`) or of Apple's `callStackSymbols`
+/// (`0   Module   0x… symbol + 64`).
+fn is_frame(line: &str) -> bool {
+    if line.starts_with("at ") || line.starts_with("... ") {
+        return true;
+    }
+    let mut tokens = line.split_whitespace();
+    tokens
+        .next()
+        .is_some_and(|t| t.bytes().all(|b| b.is_ascii_digit()))
+        && tokens.any(|t| t.starts_with("0x"))
 }
 
 /// What goes into one report besides the version and the system details.
@@ -675,6 +819,35 @@ pub fn upload_body(dir: &Path, id: &str, comment: &str) -> io::Result<String> {
 /// Sends one report after the user confirmed it (#573). Only this function uploads, and only
 /// the report it is given; nothing is sent in the background.
 pub async fn upload(dir: &Path, id: &str, comment: &str) -> Result<(), String> {
+    upload_to(dir, id, comment, &upload_url()).await
+}
+
+/// Where reports go: [`UPLOAD_URL`]. Test builds (the `test-backend` feature, which release
+/// builds never have) may point it at a local server with `MUMCORD_CRASH_UPLOAD_URL`, so the
+/// upload can be tested end to end; only a loopback address is accepted there.
+fn upload_url() -> String {
+    #[cfg(any(test, feature = "test-backend"))]
+    if let Some(url) = test_upload_url(std::env::var("MUMCORD_CRASH_UPLOAD_URL").ok().as_deref()) {
+        return url;
+    }
+    UPLOAD_URL.to_owned()
+}
+
+/// The test override if it names a loopback server.
+#[cfg(any(test, feature = "test-backend"))]
+fn test_upload_url(value: Option<&str>) -> Option<String> {
+    let url = reqwest::Url::parse(value?).ok()?;
+    let host = url.host_str()?;
+    let loopback = host == "localhost"
+        || host
+            .trim_start_matches('[')
+            .trim_end_matches(']')
+            .parse::<std::net::IpAddr>()
+            .is_ok_and(|ip| ip.is_loopback());
+    (loopback && matches!(url.scheme(), "http" | "https")).then(|| url.to_string())
+}
+
+async fn upload_to(dir: &Path, id: &str, comment: &str, url: &str) -> Result<(), String> {
     let body = upload_body(dir, id, comment).map_err(|e| e.to_string())?;
     let provider = std::sync::Arc::new(rustls::crypto::ring::default_provider());
     let tls = {
@@ -687,13 +860,14 @@ pub async fn upload(dir: &Path, id: &str, comment: &str) -> Result<(), String> {
     };
     let client = reqwest::Client::builder()
         .tls_backend_preconfigured(tls)
-        .https_only(true)
+        // Plain HTTP only for the loopback test server (see `upload_url`).
+        .https_only(!cfg!(any(test, feature = "test-backend")) || url.starts_with("https:"))
         .redirect(reqwest::redirect::Policy::none())
         .timeout(std::time::Duration::from_secs(30))
         .build()
         .map_err(|e| e.to_string())?;
     let response = client
-        .post(UPLOAD_URL)
+        .post(url)
         .header(reqwest::header::CONTENT_TYPE, "text/plain; charset=utf-8")
         .body(body)
         .send()
@@ -1902,6 +2076,174 @@ mod tests {
         let body = upload_body(dir.path(), id, "watched a VP9 share in full screen").unwrap();
         assert!(body.starts_with(&report));
         assert!(body.ends_with("\ncomment:\nwatched a VP9 share in full screen\n"));
+    }
+
+    #[test]
+    fn a_foreign_exception_keeps_its_types_but_no_messages() {
+        assert_eq!(
+            exception_type("java.lang.IllegalStateException: no server named Bob's place"),
+            "java.lang.IllegalStateException"
+        );
+        assert_eq!(
+            exception_type("  kotlin.KotlinNullPointerException "),
+            "kotlin.KotlinNullPointerException"
+        );
+        let stack = "java.lang.RuntimeException: user lea@example.org\n\
+                     \tat app.mumcord.mobile.Session.connect(Session.kt:42)\n\
+                     Caused by: java.io.IOException: /data/user/0/app.mumcord/files/x: denied\n\
+                     \t... 3 more\n\
+                     \tSuppressed: java.lang.Error: secret\n";
+        let kept = foreign_stack(stack);
+        assert!(kept.contains("\tat app.mumcord.mobile.Session.connect(Session.kt:42)"));
+        assert!(kept.contains("Caused by: java.io.IOException\n"));
+        assert!(kept.contains("\tSuppressed: java.lang.Error\n"));
+        assert!(!kept.contains("secret") && !kept.contains("denied"));
+        assert!(kept.starts_with("java.lang.RuntimeException\n"));
+        assert!(!kept.contains("lea@example.org"));
+        let multi_line = "java.lang.IllegalStateException: no server\n\
+                          named lea@example.org\n\
+                          \tat a.B.c(B.kt:1)\n\
+                          Caused by: java.io.IOException: first\n\
+                          second /data/user/0/app.mumcord/files/x\n\
+                          \t... 1 more\n";
+        assert_eq!(
+            foreign_stack(multi_line),
+            "java.lang.IllegalStateException\n\
+             \tat a.B.c(B.kt:1)\n\
+             Caused by: java.io.IOException\n\
+             \t... 1 more\n"
+        );
+        let swift = "NSInvalidArgumentException: user lea@example.org\n\
+                     0   CoreFoundation   0x00000001804a2f0c __exceptionPreprocess + 164\n\
+                     1   Mumcord          0x0000000104a1c2f0 $s7Mumcord7SessionC7connectyyF + 64\n";
+        assert_eq!(
+            foreign_stack(swift),
+            "NSInvalidArgumentException\n\
+             0   CoreFoundation   0x00000001804a2f0c __exceptionPreprocess + 164\n\
+             1   Mumcord          0x0000000104a1c2f0 $s7Mumcord7SessionC7connectyyF + 64\n"
+        );
+        let long = "\tat a.B.c(B.kt:1)\n".repeat(10_000);
+        let cut = foreign_stack(&long);
+        assert!(cut.len() <= MAX_FOREIGN_STACK + 32);
+        assert!(cut.ends_with("[stack cut]\n"));
+    }
+
+    #[test]
+    fn a_foreign_report_is_listed_with_its_kind() {
+        let dir = tempfile::tempdir().unwrap();
+        test_report(
+            dir.path(),
+            CrashKind::Foreign,
+            "java.lang.IllegalStateException",
+            &[],
+        )
+        .unwrap();
+        let listed = list(dir.path());
+        assert_eq!(listed[0].kind, CrashKind::Foreign);
+        assert_eq!(listed[0].cause, "java.lang.IllegalStateException");
+    }
+
+    #[test]
+    fn private_folders_are_shortened_and_a_root_home_is_ignored() {
+        let roots = roots_to_shorten(&[
+            PathBuf::from("/data/user/0/app.mumcord.mobile/"),
+            PathBuf::from("/data/user/0/app.mumcord.mobile/files"),
+            PathBuf::from("/"),
+            PathBuf::new(),
+        ]);
+        assert_eq!(
+            roots,
+            [
+                "/data/user/0/app.mumcord.mobile/files",
+                "/data/user/0/app.mumcord.mobile"
+            ]
+        );
+        let text =
+            "at /data/user/0/app.mumcord.mobile/files/db and /data/user/0/app.mumcord.mobile/cache";
+        assert_eq!(
+            shorten(text, &roots, Some("/")),
+            "at <private>/db and <private>/cache"
+        );
+        assert_eq!(shorten("/home/lea/x", &[], Some("/home/lea")), "~/x");
+        assert_eq!(shorten("/usr/lib/x", &[], Some("/")), "/usr/lib/x");
+    }
+
+    #[test]
+    fn only_unexpected_exits_are_dropped_for_the_newest_one() {
+        let dir = tempfile::tempdir().unwrap();
+        test_report(dir.path(), CrashKind::Unexpected, "killed", &[]).unwrap();
+        test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
+        test_report(dir.path(), CrashKind::Unexpected, "killed", &[]).unwrap();
+        drop_unexpected_reports(dir.path());
+        let kinds: Vec<CrashKind> = list(dir.path()).into_iter().map(|s| s.kind).collect();
+        assert_eq!(kinds, [CrashKind::Panic]);
+    }
+
+    #[test]
+    fn only_a_loopback_server_may_take_the_test_uploads() {
+        assert_eq!(
+            test_upload_url(Some("http://127.0.0.1:8080/api/v1/reports")).as_deref(),
+            Some("http://127.0.0.1:8080/api/v1/reports")
+        );
+        assert!(test_upload_url(Some("http://localhost:1/")).is_some());
+        assert!(test_upload_url(Some("http://[::1]:1/")).is_some());
+        assert_eq!(test_upload_url(Some("http://crash.example.org/")), None);
+        assert_eq!(test_upload_url(Some("ftp://127.0.0.1/")), None);
+        assert_eq!(test_upload_url(Some("not a url")), None);
+        assert_eq!(test_upload_url(None), None);
+    }
+
+    /// Answers one HTTP request with 200 and hands back what it received.
+    fn one_shot_server() -> (String, std::thread::JoinHandle<String>) {
+        use std::io::Read;
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}/api/v1/reports", listener.local_addr().unwrap());
+        let server = std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut received = Vec::new();
+            let mut buf = [0u8; 4096];
+            loop {
+                let n = stream.read(&mut buf).unwrap();
+                received.extend_from_slice(&buf[..n]);
+                let text = String::from_utf8_lossy(&received).to_string();
+                if let Some((head, body)) = text.split_once("\r\n\r\n") {
+                    let length = head
+                        .lines()
+                        .find_map(|l| {
+                            l.to_ascii_lowercase()
+                                .strip_prefix("content-length: ")
+                                .map(str::to_owned)
+                        })
+                        .and_then(|v| v.trim().parse::<usize>().ok())
+                        .unwrap_or(0);
+                    if body.len() >= length {
+                        break;
+                    }
+                }
+                if n == 0 {
+                    break;
+                }
+            }
+            stream
+                .write_all(b"HTTP/1.1 200 OK\r\ncontent-length: 0\r\nconnection: close\r\n\r\n")
+                .unwrap();
+            String::from_utf8_lossy(&received).to_string()
+        });
+        (url, server)
+    }
+
+    #[tokio::test]
+    async fn a_report_uploads_to_the_test_server_and_is_marked_as_sent() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = test_report(dir.path(), CrashKind::Panic, "boom", &[]).unwrap();
+        let id = path.file_name().unwrap().to_str().unwrap().to_owned();
+        let (url, server) = one_shot_server();
+        upload_to(dir.path(), &id, "it froze", &url).await.unwrap();
+        let request = server.join().unwrap();
+        assert!(request.starts_with("POST /api/v1/reports "));
+        assert!(request.contains("cause: boom"));
+        assert!(request.ends_with("\ncomment:\nit froze\n"));
+        assert!(list(dir.path())[0].uploaded);
     }
 
     #[test]

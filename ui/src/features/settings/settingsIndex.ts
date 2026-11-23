@@ -491,6 +491,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   },
   {
     section: "chatNotifications",
+    group: "localMutes.title",
+    control: "localMutes.switch",
+    terms: ["searchTerms.localMutes", "localMutes.hint"],
+  },
+  {
+    section: "chatNotifications",
     group: "blocked.title",
     terms: ["searchTerms.blocked", "blocked.hint"],
   },

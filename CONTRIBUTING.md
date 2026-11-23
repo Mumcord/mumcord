@@ -47,18 +47,9 @@ For memory-conscious ARM64 builds and on-device checks, see [Raspberry Pi develo
 
 Cargo features of the app crate (`src-tauri/Cargo.toml`) switch parts of the app that release builds must not have. Release builds (`npm run tauri build`, the release workflow) use none of them.
 
-| Feature          | What it does                                                                                                                                     | Who turns it on                        |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-| `test-backend`   | Null/WAV-file audio backend chosen by `MUMCORD_AUDIO_BACKEND`, and a throwaway updater key                                                       | The E2E build (`e2e/container-run.sh`) |
-| `phone-transfer` | "Send to your phone…" in Settings → Account & Identity: identities and the server list as QR codes for the coming Android and iOS apps (spec 05) | The E2E build; by hand for development |
-
-`phone-transfer` is off by default because the phone apps that read the codes are not released yet. The feature is the only switch: `commands::phone_transfer::ENABLED` in `src-tauri/src/commands/phone_transfer.rs` reads it, the app reports it to the UI in `app_info` (`phoneTransfer`), which shows the button only then, and without it the app refuses the commands `phone_transfer_start` and `phone_transfer_cancel`. The transfer format in the engine and store is always built and tested. To turn it on:
-
-- development: `npm run tauri dev -- --features phone-transfer`
-- a build: `npm run tauri build -- --features phone-transfer`
-- E2E: on already; `MUMCORD_E2E_APP_FEATURES=test-backend npm run e2e -- --spec <spec>` builds without it
-
-Remove the feature, the check in the invoke handler (`src-tauri/src/lib.rs`), the `phoneTransfer` field and this section when the phone apps ship, and move the changelog entry from "Internal" to "Added" of that release.
+| Feature        | What it does                                                                               | Who turns it on                        |
+| -------------- | ------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `test-backend` | Null/WAV-file audio backend chosen by `MUMCORD_AUDIO_BACKEND`, and a throwaway updater key | The E2E build (`e2e/container-run.sh`) |
 
 ## Linting workflows and scripts
 

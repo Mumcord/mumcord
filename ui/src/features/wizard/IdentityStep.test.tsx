@@ -109,6 +109,7 @@ describe("IdentityStep", () => {
 
   it.each([
     ["invalidInput", "Check the password"],
+    ["wrongPassword", "The password is not correct"],
     ["notFound", "could not be found"],
     ["io", "could not be read"],
   ] as const)("explains an import failure (%s)", async (code, text) => {

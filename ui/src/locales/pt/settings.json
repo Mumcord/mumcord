@@ -48,6 +48,7 @@
     "updates": "nova versão atualização",
     "storage": "espaço em disco limpar cache",
     "blocked": "ignorar bloquear silenciar pessoas",
+    "localMutes": "silenciar silenciado silêncio esquecer início arranque",
     "notifications": "alertas pop-ups",
     "externalContent": "conteúdo incorporado imagens pré-visualizações",
     "fileSharing": "ficheiros enviar receber descarregar guardar pasta anexo zip",
@@ -72,7 +73,8 @@
     "invalidInput": "Não funcionou: o ficheiro ou a palavra-passe não é válido.",
     "duplicateIdentity": "Esta identidade já está na tua lista.",
     "notFound": "Não foi possível encontrar o ficheiro ou o item.",
-    "generic": "Algo correu mal. Tenta novamente."
+    "generic": "Algo correu mal. Tenta novamente.",
+    "wrongPassword": "A palavra-passe não está correta. Verifique-a e tente novamente."
   },
   "identity": {
     "export": "Exportar…",
@@ -905,6 +907,11 @@
     "revokeLabel": "Revogar a conversa aceite com {{name}}",
     "revokeFailed": "Não foi possível revogar. Tenta novamente."
   },
+  "localMutes": {
+    "title": "Silenciamentos locais",
+    "switch": "Esquecer os silenciamentos locais ao iniciar o Mumcord",
+    "hint": "As pessoas que silenciaste só para ti voltam a ser audíveis depois de um reinício. Os volumes e os utilizadores bloqueados são mantidos."
+  },
   "blocked": {
     "title": "Utilizadores bloqueados",
     "hint": "Os bloqueios são guardados apenas neste computador. Os utilizadores bloqueados ficam silenciados para ti e as suas mensagens e dados do Mumcord são ignorados.",
@@ -956,7 +963,10 @@
     "channel": "Canal de atualizações",
     "channelHint": "Escolhe que versões o Mumcord oferece. As versões candidatas são compilações iniciais da próxima versão.",
     "channels": {
-      "stable": { "name": "Estável", "hint": "Apenas versões finais" },
+      "stable": {
+        "name": "Estável",
+        "hint": "Apenas versões finais"
+      },
       "releaseCandidates": {
         "name": "Versões candidatas",
         "hint": "Compilações iniciais da próxima versão; podem conter erros"

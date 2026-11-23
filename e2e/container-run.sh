@@ -101,9 +101,8 @@ if [ "$step" != test ]; then
     scripts/build-hwenc-sdk.sh /cache/native/hwenc-sdk
     export HWENC_SDK_DIR=/cache/native/hwenc-sdk
   fi
-  # MUMCORD_E2E_APP_FEATURES replaces the app's Cargo features, e.g. `test-backend` alone to check
-  # that a build without `phone-transfer` hides "Send to your phone" (CONTRIBUTING.md, "Build flags").
-  app_features="${MUMCORD_E2E_APP_FEATURES:-test-backend,phone-transfer}"
+  # MUMCORD_E2E_APP_FEATURES replaces the app's Cargo features (CONTRIBUTING.md, "Build flags").
+  app_features="${MUMCORD_E2E_APP_FEATURES:-test-backend}"
   echo "building app (debug, $app_features), netsim, test game plugin..."
   npx tauri build --debug --no-bundle --features "$app_features" -- --locked
   cargo build --locked --quiet -p netsim

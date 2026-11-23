@@ -17,7 +17,11 @@
     "watchPartyStopped": "lopetti yhteiskatselun",
     "pluginActivityStarted": "käynnisti lisäosan {{plugin}}",
     "pluginActivityStopped": "lopetti lisäosan {{plugin}}",
-    "pluginEvent": "”{{text}}”"
+    "pluginEvent": "”{{text}}”",
+    "kicked": "potkittiin ulos",
+    "banned": "sai porttikiellon",
+    "kickedBy": "potkittiin ulos ({{name}})",
+    "bannedBy": "sai porttikiellon ({{name}})"
   },
   "channel": "# {{channel}}",
   "plugin": "lisäosa",

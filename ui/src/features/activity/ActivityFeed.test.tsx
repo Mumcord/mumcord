@@ -9,6 +9,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, ScreenShare, StageActivityView, User, WatchParty } from "../../api";
 import { connectedMock, resetAll } from "../channels/testUtils";
+import { getServerStateOf } from "../channels/serverStore";
 import { resetMediaView } from "../media/mediaView";
 import { resetActivityStore } from "../plugins/stage/activityStore";
 import { resetScreenShareStore } from "../screenshare/sharesStore";
@@ -213,6 +214,23 @@ describe("activity feed", () => {
     // The own session reads as "You", not as its display name (FR-11.7).
     const own = rowWith("You connected");
     expect(within(own).getByRole("button", { name: "You" })).toHaveClass("activity-row__actor");
+  });
+
+  it("says who kicked or banned a person instead of a plain disconnect", async () => {
+    render(<ActivityFeed serverId={SERVER} />);
+    await settle();
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 1) });
+    });
+    act(() => {
+      api.mock.removeUser(NEWCOMER, { actor: SELF, ban: false });
+    });
+    const self = getServerStateOf(SERVER).users.get(SELF)?.name ?? "";
+    expect(rowWith(`Nia was kicked by ${self}`)).toBeInTheDocument();
+    act(() => {
+      api.mock.removeUser(BEN, { actor: null, ban: true });
+    });
+    expect(rowWith("was banned")).toBeInTheDocument();
   });
 
   it("keeps a live row clickable and turns it into a plain row once it ended (FR-11.12)", async () => {

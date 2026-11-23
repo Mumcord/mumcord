@@ -17,7 +17,11 @@
     "watchPartyStopped": "ukončil(a) spoločné sledovanie",
     "pluginActivityStarted": "spustil(a) {{plugin}}",
     "pluginActivityStopped": "ukončil(a) {{plugin}}",
-    "pluginEvent": "„{{text}}“"
+    "pluginEvent": "„{{text}}“",
+    "kicked": "bol(a) vyhodený(-á)",
+    "banned": "bol(a) zabanovaný(-á)",
+    "kickedBy": "bol(a) vyhodený(-á) používateľom {{name}}",
+    "bannedBy": "bol(a) zabanovaný(-á) používateľom {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "doplnok",

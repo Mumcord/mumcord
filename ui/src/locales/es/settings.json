@@ -52,7 +52,8 @@
     "externalContent": "incrustados imágenes vistas previas",
     "fileSharing": "archivos enviar recibir descargar guardar carpeta adjunto zip",
     "screenSharing": "compartir pantalla calidad resolución fps códec AV1 VP9 codificador tarjeta gráfica",
-    "camera": "cámara webcam vídeo fondo desenfoque fondo virtual espejo autovista"
+    "camera": "cámara webcam vídeo fondo desenfoque fondo virtual espejo autovista",
+    "localMutes": "silenciar silenciados local olvidar inicio"
   },
   "search": {
     "label": "Buscar ajustes",
@@ -72,7 +73,8 @@
     "invalidInput": "No ha funcionado: el archivo o la contraseña no son válidos.",
     "duplicateIdentity": "Esta identidad ya está en tu lista.",
     "notFound": "No se encontró el archivo o el elemento.",
-    "generic": "Algo salió mal. Inténtalo de nuevo."
+    "generic": "Algo salió mal. Inténtalo de nuevo.",
+    "wrongPassword": "La contraseña no es correcta. Revísala e inténtalo de nuevo."
   },
   "identity": {
     "export": "Exportar…",
@@ -905,6 +907,11 @@
     "revokeLabel": "Revocar la conversación aceptada con {{name}}",
     "revokeFailed": "No se pudo revocar. Inténtalo de nuevo."
   },
+  "localMutes": {
+    "title": "Silenciados para mí",
+    "switch": "Olvidar los silenciados para mí al iniciar Mumcord",
+    "hint": "Las personas que silenciaste solo para ti vuelven a oírse después de reiniciar. Los volúmenes y los usuarios bloqueados se conservan."
+  },
   "blocked": {
     "title": "Usuarios bloqueados",
     "hint": "Los bloqueos se guardan solo en este ordenador. Los usuarios bloqueados están silenciados para ti y se ignoran sus mensajes y datos de Mumcord.",
@@ -956,7 +963,10 @@
     "channel": "Canal de actualizaciones",
     "channelHint": "Elige qué versiones ofrece Mumcord. Las versiones candidatas son compilaciones tempranas de la próxima versión.",
     "channels": {
-      "stable": { "name": "Estable", "hint": "Solo versiones finales" },
+      "stable": {
+        "name": "Estable",
+        "hint": "Solo versiones finales"
+      },
       "releaseCandidates": {
         "name": "Versiones candidatas",
         "hint": "Compilaciones tempranas de la próxima versión; pueden contener errores"

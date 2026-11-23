@@ -30,9 +30,6 @@ pub struct AppInfo {
     /// The desktop session in use, where the platform has more than one (FR-13.31); `None`
     /// elsewhere or when neither `DISPLAY` nor `WAYLAND_DISPLAY` says anything.
     pub session: Option<SessionKind>,
-    /// Whether this build offers "Send to your phone" (Cargo feature `phone-transfer`); the
-    /// identity settings show its button only then.
-    pub phone_transfer: bool,
 }
 
 /// Which display server the app talks to (FR-13.31, FR-13.21).
@@ -137,7 +134,6 @@ pub fn app_info() -> ApiResult<AppInfo> {
         distro: distro(),
         limits: platform_limits(),
         session: session_kind(),
-        phone_transfer: super::phone_transfer::ENABLED,
     })
 }
 

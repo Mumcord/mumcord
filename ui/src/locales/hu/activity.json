@@ -17,7 +17,11 @@
     "watchPartyStopped": "leállította a közös nézést",
     "pluginActivityStarted": "elindította: {{plugin}}",
     "pluginActivityStopped": "leállította: {{plugin}}",
-    "pluginEvent": "„{{text}}”"
+    "pluginEvent": "„{{text}}”",
+    "kicked": "ki lett rúgva",
+    "banned": "ki lett tiltva",
+    "kickedBy": "ki lett rúgva ({{name}} által)",
+    "bannedBy": "ki lett tiltva ({{name}} által)"
   },
   "channel": "# {{channel}}",
   "plugin": "bővítmény",

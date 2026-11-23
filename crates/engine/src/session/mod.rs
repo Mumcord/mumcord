@@ -62,7 +62,9 @@ use crate::people::{self, People};
 use crate::sounds::SoundHub;
 use crate::voice::{self, Audio, Meter, VoicePipeline, VoiceShared};
 use convert::{channel_path, channel_view, join_path, resolve_path, split_path, user_view};
-use machine::{CertCheck, Failure, Machine, SelfVoice, Step, check_cert, format_fingerprint};
+use machine::{
+    CertCheck, Failure, Machine, ReconnectNow, SelfVoice, Step, check_cert, format_fingerprint,
+};
 
 /// Upper bound for TCP connect + TLS + login of one attempt.
 const LOGIN_TIMEOUT: Duration = Duration::from_secs(15);
@@ -334,6 +336,8 @@ pub struct MicTestDevices {
 struct Slot {
     machine: Machine,
     generation: u64,
+    /// [`Engine::reconnect_now`] for this connection's supervisor.
+    wake: Arc<ReconnectNow>,
     supervisor: Option<JoinHandle<()>>,
     session: Option<Session>,
     pending_trust: Option<PendingTrust>,
@@ -531,6 +535,7 @@ pub(crate) fn store_error(err: mumcord_store::Error) -> EngineError {
         E::SecureStorage(_) | E::CorruptStoredIdentity | E::SecretUnavailable => {
             ErrorKind::SecureStorageUnavailable
         }
+        E::Pkcs12WrongPassword => ErrorKind::WrongPassword,
         E::Pkcs12(_) | E::Pkcs12NoIdentity | E::EmptyIdentityName => ErrorKind::InvalidInput,
         E::InvalidVolume(_) | E::InvalidPort => ErrorKind::InvalidInput,
         E::InvalidIdentityLabel { .. } | E::LastIdentity => ErrorKind::InvalidInput,
@@ -1124,20 +1129,30 @@ impl Engine {
     /// Connects at app start (FR-2.7): servers marked "Always connect at start" first, then
     /// the servers connected when the app last quit, most recent first (the voice server
     /// before the others, then the saved order), up to the limit. Every connect is read-only.
-    /// Nothing happens before the first-run wizard created an identity.
+    /// Nothing connects before the first-run wizard created an identity. With "Forget local
+    /// mutes when Mumcord starts" on, every stored local mute is cleared first (FR-15.2).
     pub async fn connect_at_start(&self) -> EngineResult<()> {
+        let settings = lock(&self.inner.store).settings().map_err(store_error)?;
+        // The one clearing moment (FR-15.2, FR-15.4): once per app start, before any connect,
+        // so sessions start from the cleared state (FR-15.7). Reconnects and server switches
+        // go through `connect` and never clear. A failed sweep is logged and must not stop
+        // the startup connects.
+        if settings.forget_local_mutes_on_start {
+            match lock(&self.inner.store).clear_local_mutes() {
+                // Count only: names and certificate hashes never go into logs.
+                Ok(cleared) => {
+                    tracing::debug!(cleared, "forgot the stored local mutes at start");
+                }
+                Err(e) => {
+                    tracing::warn!(error = %e, "forgetting the local mutes at start failed");
+                }
+            }
+        }
         if self.inner.default_identity_id().await?.is_none() {
             return Ok(());
         }
-        let (servers, max) = {
-            let store = lock(&self.inner.store);
-            let servers = store.servers().map_err(store_error)?;
-            (
-                servers,
-                store.settings().map_err(store_error)?.max_connected_servers,
-            )
-        };
-        for server_id in start_servers(&servers, max) {
+        let servers = lock(&self.inner.store).servers().map_err(store_error)?;
+        for server_id in start_servers(&servers, settings.max_connected_servers) {
             if let Err(e) = self.connect(server_id, None) {
                 tracing::warn!(server_id, error = %e, "connecting at start failed");
             }
@@ -1218,6 +1233,27 @@ impl Engine {
         async move {
             tokio::join!(drained, tokio::time::sleep(sound));
         }
+    }
+
+    /// Reconnects `server_id` at once, for an app that just got a working network again (a phone
+    /// moving between Wi-Fi and mobile data): while reconnecting, the wait before the next attempt
+    /// ends now; while connected, the connection is dropped, because its socket may be dead
+    /// without any sign yet, and set up again right away. Either way the reconnect returns to
+    /// the last channel with the own mute and deafen, like any reconnect. Does nothing while the
+    /// first connect is still running or a trust decision is pending.
+    pub fn reconnect_now(&self, server_id: ServerId) -> EngineResult<()> {
+        let core = lock(&self.inner.core);
+        let slot = core
+            .slots
+            .get(&server_id)
+            .ok_or_else(|| EngineError::new(ErrorKind::NotConnected, "not connected"))?;
+        let running = matches!(slot.machine.state(), ConnState::Reconnecting { .. })
+            || (matches!(slot.machine.state(), ConnState::Connected { .. })
+                && slot.session.is_some());
+        if running && slot.pending_trust.is_none() {
+            slot.wake.request();
+        }
+        Ok(())
     }
 
     /// Stops reconnecting; same as disconnecting.
@@ -1976,9 +2012,11 @@ impl Inner {
         let generation = core.generations;
         let mut machine = Machine::default();
         machine.connect(server_id);
+        let wake = Arc::new(ReconnectNow::default());
         let slot = Slot {
             machine,
             generation,
+            wake: wake.clone(),
             supervisor: None,
             session: None,
             pending_trust: None,
@@ -1996,7 +2034,7 @@ impl Inner {
         let inner = self.clone();
         let task = self.rt.spawn(async move {
             inner
-                .supervise(generation, server_id, channel_path, rejoin)
+                .supervise(generation, server_id, &wake, channel_path, rejoin)
                 .await
         });
         if let Some(slot) = core.slots.get_mut(&server_id) {
@@ -2296,6 +2334,7 @@ impl Inner {
         self: Arc<Self>,
         generation: u64,
         server_id: ServerId,
+        wake: &ReconnectNow,
         mut path: Option<Vec<String>>,
         mut rejoin: Option<String>,
     ) {
@@ -2312,8 +2351,12 @@ impl Inner {
                     };
                     // `attempt` returns once the login is through.
                     let logged_in = Instant::now();
+                    // A request made while this attempt ran is answered by it.
+                    wake.take();
                     match self
-                        .run_connection(generation, server_id, connection, &host, port, arrival)
+                        .run_connection(
+                            generation, server_id, wake, connection, &host, port, arrival,
+                        )
                         .await
                     {
                         Ended::Lost => {
@@ -2368,7 +2411,16 @@ impl Inner {
                 Some(Step::Retry(delay)) => {
                     self.reconnects.fetch_add(1, Ordering::Relaxed);
                     tracing::info!(server_id, delay_secs = delay.as_secs(), "reconnecting");
-                    tokio::time::sleep(delay).await;
+                    if wake.take() {
+                        tracing::info!(server_id, "reconnecting now on request");
+                    } else {
+                        tokio::select! {
+                            () = tokio::time::sleep(delay) => {}
+                            () = wake.requested() => {
+                                tracing::info!(server_id, "reconnecting now on request");
+                            }
+                        }
+                    }
                 }
                 Some(Step::Stop) | None => return,
             }
@@ -2518,10 +2570,12 @@ impl Inner {
     }
 
     /// Runs a synced connection until it ends.
+    #[allow(clippy::too_many_arguments)]
     async fn run_connection(
         self: &Arc<Self>,
         generation: u64,
         server_id: ServerId,
+        wake: &ReconnectNow,
         connection: Connection,
         host: &str,
         port: u16,
@@ -2639,6 +2693,14 @@ impl Inner {
                 }
             };
             tokio::select! {
+                () = wake.requested() => {
+                    // The app knows the network changed: this socket may be dead without any
+                    // sign yet. Close it and connect again at once, as after a lost connection
+                    // (channel, mute and deafen are restored).
+                    tracing::info!(server_id, "dropping the connection to reconnect now");
+                    handle.disconnect();
+                    return self.end_connection(generation, server_id, DisconnectReason::Timeout);
+                }
                 event = events.recv() => {
                     let event = match event {
                         Some(Event::Disconnected(reason)) => {
@@ -3030,7 +3092,12 @@ impl Inner {
                 }
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
             }
-            Event::UserRemoved { user, .. } => {
+            Event::UserRemoved {
+                user,
+                actor,
+                reason,
+                ban,
+            } => {
                 let mut core = lock(&self.core);
                 if let Some(slot) = core.slots.get_mut(&server_id) {
                     slot.people.forget(user.session);
@@ -3086,7 +3153,12 @@ impl Inner {
                     user.session,
                 );
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
-                ctx.events.emit(EngineEvent::UserRemoved(user.session));
+                ctx.events.emit(EngineEvent::UserRemoved {
+                    session: user.session,
+                    actor: *actor,
+                    reason: reason.clone(),
+                    ban: *ban,
+                });
             }
             Event::PermissionDenied(denied) => {
                 // A refusal answers the open kick or ban dialog (issue #253, FR-10.59).
@@ -4071,5 +4143,106 @@ mod password_override_tests {
         assert!(lock(&engine.inner.password_overrides).is_empty());
         engine.connect(server.id, None).expect("plain connect");
         assert!(lock(&engine.inner.password_overrides).is_empty());
+    }
+}
+
+#[cfg(test)]
+mod forget_local_mutes_tests {
+    use super::*;
+    use crate::{PasswordChange, ServerFields};
+    use mumcord_store::PersonSetting;
+
+    const HASH: &str = "aa11";
+
+    // Single-threaded runtime: the connect task cannot run before the assertions, so the
+    // stored person setting is observable right after the call. Port 1 is unreachable; the
+    // sweep must not depend on a connect succeeding.
+    async fn engine_with_muted_person(forget: bool) -> (Engine, tempfile::TempDir, ServerId) {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, _rx) = Engine::new(
+            dir.path(),
+            SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        engine
+            .identity_create("Tester".into(), None)
+            .await
+            .expect("identity");
+        let server = engine
+            .server_add(ServerFields {
+                label: "s".into(),
+                address: "127.0.0.1".into(),
+                port: 1,
+                username: "me".into(),
+                password: PasswordChange::Keep,
+            })
+            .await
+            .expect("server");
+        let store = engine.store_handle();
+        let stored = lock(&store);
+        let mut settings = stored.settings().expect("settings");
+        settings.forget_local_mutes_on_start = forget;
+        stored.save_settings(&settings).expect("save settings");
+        stored
+            .set_person_setting(
+                server.id,
+                HASH,
+                &PersonSetting {
+                    volume: 80,
+                    local_mute: true,
+                    share_volume: 60,
+                },
+            )
+            .expect("person setting");
+        let mut saved = stored.server(server.id).expect("server").expect("saved");
+        saved.always_connect_at_start = true;
+        stored.update_server(&saved).expect("always connect");
+        drop(stored);
+        (engine, dir, server.id)
+    }
+
+    fn person(engine: &Engine, server_id: ServerId) -> PersonSetting {
+        lock(&engine.store_handle())
+            .person_setting(server_id, HASH)
+            .expect("person setting")
+            .expect("stored")
+    }
+
+    #[tokio::test]
+    async fn start_with_the_flag_on_clears_mutes_before_connecting() {
+        let (engine, _dir, server_id) = engine_with_muted_person(true).await;
+        engine.connect_at_start().await.expect("connect at start");
+        let setting = person(&engine, server_id);
+        assert!(!setting.local_mute, "FR-15.2: the sweep ran at start");
+        assert_eq!(setting.volume, 80, "volumes are never touched");
+        assert_eq!(setting.share_volume, 60, "share volumes are never touched");
+    }
+
+    #[tokio::test]
+    async fn start_with_the_flag_off_keeps_mutes() {
+        let (engine, _dir, server_id) = engine_with_muted_person(false).await;
+        engine.connect_at_start().await.expect("connect at start");
+        assert!(person(&engine, server_id).local_mute, "FR-15.3");
+    }
+
+    #[tokio::test]
+    async fn connect_never_clears_even_with_the_flag_on() {
+        let (engine, _dir, server_id) = engine_with_muted_person(true).await;
+        // `connect` is also the reconnect and server-switch path (FR-15.4).
+        engine.connect(server_id, None).expect("connect");
+        assert!(person(&engine, server_id).local_mute);
+    }
+
+    #[tokio::test]
+    async fn turning_the_flag_on_clears_nothing_immediately() {
+        let (engine, _dir, server_id) = engine_with_muted_person(false).await;
+        let mut settings = engine.settings().expect("settings");
+        settings.forget_local_mutes_on_start = true;
+        engine.update_settings(settings).await.expect("update");
+        assert!(
+            person(&engine, server_id).local_mute,
+            "FR-15.5: only the next app start clears"
+        );
     }
 }

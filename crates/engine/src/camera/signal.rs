@@ -64,8 +64,15 @@ impl Codec {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CameraMessage {
     /// Camera owner to the channel (and to newcomers): the camera is on, with this broadcast id,
-    /// and whether it sends the Bovnar media profile (wire `mv: 2`, FR-8.95).
-    On { id: String, media: bool },
+    /// and whether it sends the Bovnar media profile (wire `mv: 2`, FR-8.95). `paused` (wire
+    /// `ps: 1`, spec 05 FR-5.75): the owner's app went to the background and sends no frames
+    /// until it is back; the owner announces `on` again on every change. Clients before this
+    /// field ignore it and treat the repeated `on` of the same broadcast as nothing new.
+    On {
+        id: String,
+        media: bool,
+        paused: bool,
+    },
     /// Camera owner to the channel: the camera is off.
     Off,
     /// Viewer to camera owner: please admit me to broadcast `id`. `codecs` lists what the viewer
@@ -136,8 +143,9 @@ fn is_broadcast_id(id: &str) -> bool {
 /// Encodes a message as a Bovnar document; `None` if an id is not a broadcast id or `codecs` is
 /// empty.
 pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
+    let paused = matches!(message, CameraMessage::On { paused: true, .. });
     let (t, id, codecs, media) = match message {
-        CameraMessage::On { id, media } => ("on", Some(id), None, *media),
+        CameraMessage::On { id, media, .. } => ("on", Some(id), None, *media),
         CameraMessage::Off => ("off", None, None, false),
         CameraMessage::CamJoin { id, codecs, media } => {
             if codecs.is_empty() {
@@ -165,6 +173,9 @@ pub fn encode(message: &CameraMessage) -> Option<Vec<u8>> {
         if media {
             w.write_uint("mv", 2, 8, bovnar::Base::DECIMAL)?;
         }
+        if paused {
+            w.write_uint("ps", 1, 8, bovnar::Base::DECIMAL)?;
+        }
         Ok(())
     })
 }
@@ -180,6 +191,7 @@ pub fn decode(data: &[u8]) -> Result<CameraMessage, Refused> {
         "on" => CameraMessage::On {
             id: id_of(&doc)?,
             media: media_of(&doc),
+            paused: doc.get("ps").and_then(|node| node.as_u64()) == Some(1),
         },
         "cam-leave" => CameraMessage::CamLeave { id: id_of(&doc)? },
         "full" => CameraMessage::Full { id: id_of(&doc)? },
@@ -389,6 +401,7 @@ mod tests {
             CameraMessage::On {
                 id: ID.into(),
                 media: true,
+                paused: false,
             },
             CameraMessage::Off,
             CameraMessage::CamJoin {
@@ -449,6 +462,7 @@ mod tests {
         let new = CameraMessage::On {
             id: ID.into(),
             media: true,
+            paused: false,
         };
         let encoded = encode(&new).expect("encodes");
         assert!(String::from_utf8_lossy(&encoded).contains("mv"));
@@ -456,10 +470,32 @@ mod tests {
         let old = CameraMessage::On {
             id: ID.into(),
             media: false,
+            paused: false,
         };
         let encoded = encode(&old).expect("encodes");
         assert!(!String::from_utf8_lossy(&encoded).contains("mv"));
         assert_eq!(decode(&encoded), Ok(old));
+    }
+
+    #[test]
+    fn a_paused_camera_says_so_and_older_documents_read_as_running() {
+        let paused = CameraMessage::On {
+            id: ID.into(),
+            media: true,
+            paused: true,
+        };
+        let encoded = encode(&paused).expect("encodes");
+        assert!(String::from_utf8_lossy(&encoded).contains("ps"));
+        assert_eq!(decode(&encoded), Ok(paused));
+        // What a client before the field sends: no `ps`, so the camera runs.
+        let running = CameraMessage::On {
+            id: ID.into(),
+            media: true,
+            paused: false,
+        };
+        let encoded = encode(&running).expect("encodes");
+        assert!(!String::from_utf8_lossy(&encoded).contains("ps"));
+        assert_eq!(decode(&encoded), Ok(running));
     }
 
     #[test]
@@ -473,14 +509,16 @@ mod tests {
         assert_eq!(
             encode(&CameraMessage::On {
                 id: "short".into(),
-                media: false
+                media: false,
+                paused: false,
             }),
             None
         );
         assert_eq!(
             encode(&CameraMessage::On {
                 id: "ABCDEF0123456789".into(),
-                media: false
+                media: false,
+                paused: false,
             }),
             None
         );

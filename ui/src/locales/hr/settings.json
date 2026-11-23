@@ -48,6 +48,7 @@
     "updates": "nova verzija nadogradnja",
     "storage": "prostor na disku očisti predmemoriju",
     "blocked": "ignoriraj blokiraj utišaj osobe",
+    "localMutes": "utišaj utišavanje utišan zaboravi pokretanje start",
     "notifications": "upozorenja skočni prozori",
     "externalContent": "ugradnje slike pretpregledi",
     "fileSharing": "datoteke pošalji primi preuzmi spremi mapa privitak zip",
@@ -72,7 +73,8 @@
     "invalidInput": "To nije uspjelo: datoteka ili lozinka nisu ispravne.",
     "duplicateIdentity": "Ovaj identitet je već u tvom popisu.",
     "notFound": "Datoteka ili stavka nije pronađena.",
-    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno.",
+    "wrongPassword": "Lozinka nije točna. Provjerite je i pokušajte ponovno."
   },
   "identity": {
     "export": "Izvezi…",
@@ -905,6 +907,11 @@
     "revokeLabel": "Opozovi prihvaćeni razgovor s korisnikom {{name}}",
     "revokeFailed": "Opoziv nije uspio. Pokušaj ponovno."
   },
+  "localMutes": {
+    "title": "Lokalna utišavanja",
+    "switch": "Zaboravi lokalna utišavanja pri pokretanju Mumcorda",
+    "hint": "Osobe koje si utišao samo za sebe ponovno će se čuti nakon ponovnog pokretanja. Glasnoće i blokirani korisnici ostaju sačuvani."
+  },
   "blocked": {
     "title": "Blokirani korisnici",
     "hint": "Blokade se čuvaju samo na ovom računalu. Blokirani korisnici su za tebe utišani, a njihove poruke i Mumcord podaci se ignoriraju.",
@@ -956,7 +963,10 @@
     "channel": "Kanal ažuriranja",
     "channelHint": "Odaberi koja izdanja Mumcord nudi. Kandidati za izdanje rane su verzije sljedeće verzije.",
     "channels": {
-      "stable": { "name": "Stabilna", "hint": "Samo završna izdanja" },
+      "stable": {
+        "name": "Stabilna",
+        "hint": "Samo završna izdanja"
+      },
       "releaseCandidates": {
         "name": "Kandidati za izdanje",
         "hint": "Rane verzije sljedeće verzije; mogu sadržavati greške"

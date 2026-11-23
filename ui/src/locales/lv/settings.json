@@ -48,6 +48,7 @@
     "updates": "jauna versija jauninājums",
     "storage": "diska vieta notīrīt kešatmiņu",
     "blocked": "ignorēt bloķēt apklusināt cilvēki",
+    "localMutes": "klusināt klusinājums klusināts aizmirst startēšana palaist",
     "notifications": "brīdinājumi uznirstošie logi",
     "externalContent": "iegulumi attēli priekšskatījumi",
     "fileSharing": "faili sūtīt saņemt lejupielādēt saglabāt mape pielikums zip",
@@ -72,7 +73,8 @@
     "invalidInput": "Tas neizdevās: fails vai parole nav derīga.",
     "duplicateIdentity": "Šī identitāte jau ir sarakstā.",
     "notFound": "Failu vai vienumu neizdevās atrast.",
-    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz.",
+    "wrongPassword": "Parole nav pareiza. Pārbaudiet to un mēģiniet vēlreiz."
   },
   "identity": {
     "export": "Eksportēt…",
@@ -905,6 +907,11 @@
     "revokeLabel": "Atsaukt pieņemto sarunu ar {{name}}",
     "revokeFailed": "Atsaukšana neizdevās. Lūdzu, mēģini vēlreiz."
   },
+  "localMutes": {
+    "title": "Vietējie klusinājumi",
+    "switch": "Aizmirst vietējos klusinājumus, kad Mumcord startē",
+    "hint": "Cilvēki, kurus tu klusināji tikai sev, pēc pārstartēšanas atkal būs dzirdami. Skaļumi un bloķētie lietotāji paliek nemainīgi."
+  },
   "blocked": {
     "title": "Bloķētie lietotāji",
     "hint": "Bloķējumi tiek glabāti tikai šajā datorā. Bloķētie lietotāji tev ir apklusināti, un viņu ziņas un Mumcord dati tiek ignorēti.",
@@ -956,7 +963,10 @@
     "channel": "Atjauninājumu kanāls",
     "channelHint": "Izvēlies, kuras versijas Mumcord piedāvā. Izlaides kandidāti ir nākamās versijas agrīnie būvējumi.",
     "channels": {
-      "stable": { "name": "Stabilā", "hint": "Tikai galīgās versijas" },
+      "stable": {
+        "name": "Stabilā",
+        "hint": "Tikai galīgās versijas"
+      },
       "releaseCandidates": {
         "name": "Izlaides kandidāti",
         "hint": "Nākamās versijas agrīnie būvējumi; var saturēt kļūdas"

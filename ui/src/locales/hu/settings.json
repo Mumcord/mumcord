@@ -48,6 +48,7 @@
     "updates": "új verzió frissítés",
     "storage": "lemezterület gyorsítótár törlése",
     "blocked": "mellőzés tiltás némítás személyek",
+    "localMutes": "némítás némít elnémít felejtsd el indítás start",
     "notifications": "riasztások felugró ablakok",
     "externalContent": "beágyazások képek előnézetek",
     "fileSharing": "fájlok küldés fogadás letöltés mentés mappa melléklet zip",
@@ -70,7 +71,8 @@
     "invalidInput": "Ez nem sikerült: a fájl vagy a jelszó érvénytelen.",
     "duplicateIdentity": "Ez az identitás már szerepel a listádban.",
     "notFound": "A fájl vagy elem nem található.",
-    "generic": "Valami hiba történt. Próbáld újra."
+    "generic": "Valami hiba történt. Próbáld újra.",
+    "wrongPassword": "A jelszó nem megfelelő. Ellenőrizd, és próbáld újra."
   },
   "identity": {
     "export": "Exportálás…",
@@ -899,6 +901,11 @@
     "revokeLabel": "Az elfogadott beszélgetés visszavonása vele: {{name}}",
     "revokeFailed": "A visszavonás nem sikerült. Próbáld újra."
   },
+  "localMutes": {
+    "title": "Helyi némítások",
+    "switch": "Helyi némítások elfelejtése a Mumcord indításakor",
+    "hint": "Azok a személyek, akiket csak magadnak némítottál el, újraindítás után ismét hallhatók lesznek. A hangerők és a letiltott felhasználók megmaradnak."
+  },
   "blocked": {
     "title": "Letiltott felhasználók",
     "hint": "A letiltások csak ezen a számítógépen tárolódnak. A letiltott felhasználók némítva vannak nálad, üzeneteiket és Mumcord-adataikat figyelmen kívül hagyjuk.",
@@ -950,7 +957,10 @@
     "channel": "Frissítési csatorna",
     "channelHint": "Válaszd ki, mely kiadásokat kínálja fel a Mumcord. A kiadásra jelölt verziók a következő verzió korai változatai.",
     "channels": {
-      "stable": { "name": "Stabil", "hint": "Csak végleges kiadások" },
+      "stable": {
+        "name": "Stabil",
+        "hint": "Csak végleges kiadások"
+      },
       "releaseCandidates": {
         "name": "Kiadásra jelölt verziók",
         "hint": "A következő verzió korai változatai; hibákat tartalmazhatnak"

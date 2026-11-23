@@ -189,8 +189,8 @@ export interface MockControls {
   activityNotices(): readonly ActivityNotice[];
   /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
   messageSounds(): readonly ("message" | "mention")[];
-  /** Simulates a person leaving the server. */
-  removeUser(session: number): void;
+  /** Simulates a person leaving the server, or being kicked or banned by `by`. */
+  removeUser(session: number, by?: { actor: number | null; ban: boolean }): void;
   /** Simulates a person joining the server (or changing, if the session exists). */
   upsertUser(user: User): void;
   /**
@@ -436,6 +436,7 @@ const DEFAULT_SETTINGS: Settings = {
     keepRequests: true,
   },
   blockedMessages: "collapse",
+  forgetLocalMutesOnStart: false,
   filesReceive: true,
   filesMaxSize: "1G",
   filesSaveFolder: null,
@@ -4051,7 +4052,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               distro: null,
               limits: [],
               session: null,
-              phoneTransfer: true,
             }
           : {
               version: "0.0.0-mock",
@@ -4062,7 +4062,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               distro: null,
               limits: [],
               session: null,
-              phoneTransfer: true,
             },
       ),
 
@@ -4239,7 +4238,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const outcome = checkAction(serverId, session, "kick");
       if (outcome === "denied") return fail("permissionDenied", "kick right in the root channel");
       if (outcome === "self") return fail("invalidInput", "kicking yourself is not offered");
-      removePerson(serverId, session);
+      removePerson(serverId, session, false);
       // A send the server confirms is one it answers with the person's removal (issue #253).
       return Promise.resolve(reason ? "confirmed" : "unconfirmed");
     },
@@ -4252,7 +4251,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       if (!input.byCert && !input.byIp)
         return fail("invalidInput", "at least one target must stay on");
       if (input.quick) {
-        removePerson(serverId, session);
+        removePerson(serverId, session, true);
         return Promise.resolve({ kind: "quickBanned" });
       }
       const list = [...(banLists.get(serverId) ?? seedBans())];
@@ -4282,7 +4281,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         });
         banLists.set(serverId, list);
       }
-      if (input.removeNow) removePerson(serverId, session);
+      if (input.removeNow) removePerson(serverId, session, true);
       return Promise.resolve({ kind: "saved", key, removed: input.removeNow });
     },
     registeredUsersOpen: (serverId) => {
@@ -4802,9 +4801,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
 
   /** Takes the person off the mock server, like a server that answers a kick with their removal. */
-  function removePerson(serverId: number, session: number): void {
+  function removePerson(serverId: number, session: number, ban: boolean): void {
     currentServerId = serverId;
-    mock.removeUser(session);
+    const actor = sessions.get(serverId)?.snapshot?.selfSession ?? null;
+    mock.removeUser(session, { actor, ban });
   }
 
   /**
@@ -4961,11 +4961,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     desktopNotices: () => desktopNotices,
     activityNotices: () => activityNotices,
     messageSounds: () => messageSounds,
-    removeUser: (session) => {
+    removeUser: (session, by) => {
       focused();
       const snap = requireSnapshot();
       snap.users = snap.users.filter((u) => u.session !== session);
-      emitServer("userRemoved", { session });
+      emitServer("userRemoved", {
+        session,
+        actor: by?.actor ?? null,
+        reason: null,
+        ban: by?.ban ?? false,
+      });
     },
     upsertUser: (user) => {
       focused();

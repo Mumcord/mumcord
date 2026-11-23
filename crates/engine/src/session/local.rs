@@ -254,6 +254,20 @@ impl Engine {
             .await
     }
 
+    /// [`Self::identity_import`] from the file's bytes, for apps that get a picked file as bytes
+    /// and keep no temporary copy (the phone apps). Without a common name in the certificate
+    /// and without a typed label, the identity is named after the certificate's other fields.
+    /// A wrong password is [`ErrorKind::WrongPassword`], data that holds no identity
+    /// [`ErrorKind::InvalidInput`].
+    pub async fn identity_import_bytes(
+        &self,
+        data: Vec<u8>,
+        password: Option<String>,
+        label: Option<String>,
+    ) -> EngineResult<IdentityView> {
+        self.identity_import_data(data, password, label, "").await
+    }
+
     /// Imports PKCS#12 data as an additional identity; shared by the file import and the
     /// import from the official client (issue #66). `fallback` is the label to use when the
     /// certificate carries no common name.
@@ -331,6 +345,19 @@ impl Engine {
         path: PathBuf,
         password: String,
     ) -> EngineResult<()> {
+        let data = self.identity_export_bytes(id, password).await?;
+        tokio::fs::write(&path, data)
+            .await
+            .map_err(|e| EngineError::new(ErrorKind::Io, format!("writing the file failed: {e}")))
+    }
+
+    /// [`Self::identity_export`] as bytes, for apps that hand the file to the system's share
+    /// sheet without writing it themselves (the phone apps).
+    pub async fn identity_export_bytes(
+        &self,
+        id: IdentityId,
+        password: String,
+    ) -> EngineResult<Vec<u8>> {
         if password.is_empty() {
             return Err(EngineError::invalid("the export password is empty"));
         }
@@ -347,9 +374,7 @@ impl Engine {
                 identity.to_pkcs12(&password)
             })
             .await?;
-        tokio::fs::write(&path, data)
-            .await
-            .map_err(|e| EngineError::new(ErrorKind::Io, format!("writing the file failed: {e}")))
+        Ok(data)
     }
 
     /// Collects the chosen identities and, if wanted, the server list for "Send to your phone"
@@ -1222,6 +1247,47 @@ mod tests {
             .expect_err("duplicate");
         assert_eq!(again.kind, ErrorKind::DuplicateIdentity);
         assert_eq!(other.identity_list().await.expect("list").len(), 1);
+        let _ = other_dir;
+    }
+
+    #[tokio::test]
+    async fn identities_travel_as_bytes_and_a_wrong_password_is_told_apart() {
+        let (_dir, engine) = engine().await;
+        let main = engine
+            .identity_create("Zoe".into(), Some("Main".into()))
+            .await
+            .expect("create");
+        // Derived at run time: a literal password in a test reads as a hard-coded secret.
+        let password = main.cert_hash.clone();
+        let wrong: String = password.chars().rev().collect();
+        let data = engine
+            .identity_export_bytes(main.id, password.clone())
+            .await
+            .expect("export");
+
+        let other_dir = tempfile::tempdir().expect("tempdir");
+        let (other, _other_rx) = Engine::new(
+            other_dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("second engine");
+        let wrong = other
+            .identity_import_bytes(data.clone(), Some(wrong), None)
+            .await
+            .expect_err("wrong password");
+        assert_eq!(wrong.kind, ErrorKind::WrongPassword);
+        let not_an_identity = other
+            .identity_import_bytes(b"a photo, not a certificate".to_vec(), None, None)
+            .await
+            .expect_err("no identity");
+        assert_eq!(not_an_identity.kind, ErrorKind::InvalidInput);
+        let imported = other
+            .identity_import_bytes(data, Some(password), None)
+            .await
+            .expect("import");
+        assert_eq!(imported.cert_hash, main.cert_hash);
+        assert_eq!(imported.label, "Zoe", "named after the certificate");
         let _ = other_dir;
     }
 

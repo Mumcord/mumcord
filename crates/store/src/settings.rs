@@ -883,6 +883,9 @@ pub struct Settings {
     pub private_messages: PrivateMessageSettings,
     /// Channel messages of blocked users: collapsed or hidden (issue #140).
     pub blocked_messages: BlockedMessages,
+    /// "Forget local mutes when Mumcord starts" (issue #872, FR-15.1): app start resets every
+    /// stored local mute on all servers before the first connect. Off by default.
+    pub forget_local_mutes_on_start: bool,
     /// Accept files offered by others (spec 07, default on).
     pub files_receive: bool,
     /// Largest file accepted from others.
@@ -1184,6 +1187,7 @@ impl Default for Settings {
             legacy_window_overlay_enabled: false,
             private_messages: PrivateMessageSettings::default(),
             blocked_messages: BlockedMessages::default(),
+            forget_local_mutes_on_start: false,
             files_receive: true,
             files_max_size: FilesMaxSize::default(),
             files_save_folder: None,
@@ -1466,6 +1470,24 @@ mod tests {
         store.save_settings(&changed).expect("save");
         store.save_settings(&changed).expect("save twice");
         assert_eq!(store.settings().expect("reload"), changed);
+    }
+
+    #[test]
+    fn forget_local_mutes_on_start_defaults_off_and_round_trips() {
+        // FR-15.1: off by default, also for a record written before the key existed.
+        let (_dir, store) = temp_store();
+        assert!(!store.settings().expect("load").forget_local_mutes_on_start);
+        assert!(!Settings::default().forget_local_mutes_on_start);
+        let old = load_raw(r#"{"wizard_completed":true,"talk_mode":"push_to_talk"}"#);
+        assert!(old.wizard_completed);
+        assert!(!old.forget_local_mutes_on_start);
+
+        let changed = Settings {
+            forget_local_mutes_on_start: true,
+            ..Settings::default()
+        };
+        store.save_settings(&changed).expect("save");
+        assert_eq!(store.settings().expect("load"), changed);
     }
 
     #[test]

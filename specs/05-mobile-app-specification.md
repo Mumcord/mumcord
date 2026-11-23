@@ -1,6 +1,7 @@
 # Epic 5 – Android and iOS app · Specification
 
-> Status: Final (brainstorming completed) · As of: 2026-11-14
+> Status: Final (brainstorming completed), amended by the decisions after review in section 12.1 · As of: 2026-11-23
+> Implementation report: `specs/05-mobile-app-implementation.md`
 > Sources: `specs/roadmap.md` (Epic 5), `specs/05-mobile-app-brainstorming.md`, overview issue #228
 > Builds on: `specs/01-foundation-specification.md` (engine, voice, chat), `specs/02-multi-server-themes-specification.md` (themes), `specs/03-identity-manager-specification.md` (identities), `specs/03-comfort-polish-specification.md` (whisper, Do Not Disturb, blocking), `specs/04-mumpeer-relay-specification.md` (relay), `specs/07-file-sharing-screenshare-specification.md` and its 0.9.0 addendum (streams), `specs/08-camera-sharing-specification.md` (camera), `specs/10-admin-moderation-specification.md` (moderation), `specs/11-activity-log-specification.md` (activity log)
 
@@ -126,16 +127,16 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 - **FR-5.70** A screen share or camera of someone in the current channel appears as a live tile in the channel. On Wi-Fi it starts by itself; on mobile data per FR-5.41.
 - **FR-5.71** Tapping a tile opens the stream full screen with stream volume, viewer count and close; rotating the phone gives landscape. Going back shrinks it to a floating mini window that stays above chat and channels and can be closed or expanded. On tablets the stream fills the right column.
 - **FR-5.72** Stream sound (where the sharer sends it) plays mixed with voice and has its own volume.
-- **FR-5.73** Streams use the same paths as desktop: directly between clients where possible, otherwise through the optional relay. Where neither path works, the tile says "Stream not reachable from this network".
-- **FR-5.74** Sharing the own camera: a preview sheet first (never skipped), front and back camera switch, then "Start sharing". Limits as Spec 08, with a mobile cap of 540p30. No background blur or effects.
-- **FR-5.75** The camera pauses while the app is in the background and resumes on return; viewers see a paused state. Voice is unaffected.
+- **FR-5.73** Streams use the same paths as desktop: directly between clients where possible, otherwise through the optional relay. Where neither path works, the tile says "Stream not reachable from this network". On a server without a relay, watching a stream or camera may use a direct connection, which shows the phone's IP address to the sharer. This is accepted as designed (decision D-3, section 12.1): the app explains it before the first direct connection, and Settings offer the desktop's "Direct connections" setting with the same hint.
+- **FR-5.74** Sharing the own camera: a preview sheet first (never skipped), front and back camera switch, then "Start sharing". Limits as Spec 08, with a mobile cap of 540p30. No background blur or effects. As built, the camera is sent as landscape VP9 encoded in software at 640 × 360 (the fallback named in section 13); 540p30 needs the phone's hardware encoder, and the engine hook for it is deferred, as is a portrait camera picture (decision D-5).
+- **FR-5.75** The camera pauses while the app is in the background and resumes on return; viewers see a paused state. Voice is unaffected. The engine signal for the paused state landed in Mumcord/mumcord#913 (decision D-4).
 - **FR-5.76** In the system picture-in-picture mode (leaving the app while watching) the stream continues in the system's small window where the platform allows it.
 
 ### 4.9 Profile and themes
 
 - **FR-5.80** Edit the own comment and avatar (same size limits and sanitising as desktop).
-- **FR-5.81** Appearance: System, Dark, Light. Theme gallery with the built-in themes, custom themes by pasting a theme code, sharing a theme code, and "Use server theme when offered" (Spec 02 FR-2.14 … FR-2.17). Contrast rules of Spec 02 apply.
-- **FR-5.82** All texts exist in the 24 desktop languages; the app follows the phone language with a manual override. Texts are taken from the desktop translation files; mobile-only texts are added there.
+- **FR-5.81** Appearance: System, Dark, Light. Theme gallery with the built-in themes, custom themes by pasting a theme code, sharing a theme code, and a theme per saved server that the user picks in the edit-server form (Spec 02 FR-2.14 … FR-2.17). There is no theme offered by the server; the per-server theme is always the user's own choice (decision D-1). Contrast rules of Spec 02 apply.
+- **FR-5.82** All texts exist in the 24 desktop languages; the app follows the phone language with a manual override. Texts are taken from the desktop translation files; mobile-only texts are added there. Until the next desktop translation pass, mobile-only texts exist in English and German; the other languages show them in English. `i18n/mobile/en.json` in the mobile repository holds them ready for that pass (decision D-8).
 
 ### 4.10 Moderation basics and activity log
 
@@ -147,9 +148,9 @@ The server's ACLs decide; the app enforces nothing itself and only reflects what
 
 ### 4.11 Settings, updates and diagnostics
 
-- **FR-5.100** Settings cover: voice (talk mode, noise suppression, input level meter, default output), mobile data (FR-5.41), battery (FR-5.42), notifications (FR-5.54, FR-5.55), chat (link previews, history retention), appearance, language, identities, about (version, contained engine version, licences).
+- **FR-5.100** Settings cover: voice (talk mode, noise suppression, input level meter, default output), mobile data (FR-5.41), battery (FR-5.42), notifications (FR-5.54, FR-5.55), chat (link previews, history retention), direct connections (FR-5.73), appearance, language, identities, about (version, contained engine version, licences).
 - **FR-5.101** Android: at most once a day the app checks the GitHub releases of the mobile repository for a newer version and shows "Version X is available"; the action opens the download of the signed APK in the browser. The check can be switched off. Android itself refuses an APK that is not signed with the same key.
-- **FR-5.102** iOS updates are handled by TestFlight.
+- **FR-5.102** iOS updates are handled by TestFlight. TestFlight waits with the rest of the iOS work (decision D-2).
 - **FR-5.103** Crash reports are opt-in, as on desktop, with the same privacy rules.
 
 ## 5. UI & UX
@@ -212,7 +213,7 @@ flowchart TD
 └──┴──────────────┴───────────────────────────┘
 ```
 
-- **Touch rules**: every target at least 44 pt / 48 dp; no action only reachable by long-press or swipe (each has a visible alternative); destructive actions confirm, except "Leave", which disconnects at once (FR-5.22).
+- **Touch rules**: every target at least 44 pt / 48 dp (so channel tree rows are 48 dp high on Android, not the mockup's 44 dp; decision D-7); no action only reachable by long-press or swipe (each has a visible alternative); destructive actions confirm, except "Leave", which disconnects at once (FR-5.22).
 - **Mockups and missing functions**: an element of a mockup that has no function yet is left out until it works; there are no inactive controls. Examples: the search and settings icons on the server list, the audio output chip, stream tiles. They return with their features. The screens built without a mockup on Android were reviewed and approved as built on 2026-11-14; the iOS versions keep that look.
 - **Platform-native pieces**: back gesture and back button, share sheet, file and photo pickers, permission dialogs, keyboards, system call screen, system picture-in-picture.
 - **Empty states**: no servers yet (with "Add server" and "Scan from desktop app"), empty channel, no messages, no activity.
@@ -327,8 +328,8 @@ stateDiagram-v2
 
 - **Repository**: new mobile repository in the Mumcord organisation, AGPL-3.0 like the client, with its own README, CHANGELOG, issue tracker and branch rules.
 - **Versions**: own version numbers starting at 0.1.0, released whenever ready. Each release names the contained engine version in the release notes and on the About screen.
-- **Android**: one signed universal APK (arm64) attached to the GitHub release of the mobile repository, with SHA-256 checksum, SBOM and third-party notices. Signing key only as CI secret; an offline backup is kept by the product manager, because losing the key forces every user to reinstall.
-- **iOS**: build on a macOS CI runner, upload to TestFlight. Internal testers first; the public TestFlight link follows as its own step once the app is stable.
+- **Android**: one signed universal APK (arm64) attached to the GitHub release of the mobile repository, with SHA-256 checksum, SBOM and third-party notices. Signing key only as CI secret; an offline backup is kept by the product manager, because losing the key forces every user to reinstall. The release APK is about 41 MB: unused app code is removed (R8) and the engine is optimised as a whole (link-time optimisation). The engine libraries stay uncompressed inside the APK, so Android can load them in place without unpacking a copy (recommendation; final call by the product manager pending, decision D-6).
+- **iOS**: build on a macOS CI runner, upload to TestFlight. Internal testers first; the public TestFlight link follows as its own step once the app is stable. Paused together with the rest of the iOS work until Android is finished (decision D-2).
 - **CI on every pull request**: Rust tests of the bridge, Android unit and Compose tests, iOS unit and XCUITest tests, lint and format checks, and the emulator end-to-end run below.
 - **Automated end-to-end tests**: the app runs in an Android emulator and an iOS simulator against the local Docker Mumble test server (Spec 01), with a second scripted client: connect, channels, chat, private messages, voice round trip with injected audio, moderation, transfer import with generated codes. Never against public servers; the public server browser is tested against a local fixture list, never the real list service.
 - **Manual device checklist per release** (real phones, at least one current and one minimum-version device per platform): background and locked-screen voice, incoming phone call, Bluetooth and wired headset, headset button, output switching, network change, battery measurement, camera sharing, stream viewing on mobile data, notifications, TalkBack and VoiceOver.
@@ -337,7 +338,7 @@ stateDiagram-v2
 
 ## 11. Acceptance criteria (verifiable in the running app)
 
-Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as second client, checked on Android and iOS.
+Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as second client, checked on Android and iOS. While iOS is paused (decision D-2), the iOS half of every criterion and the TestFlight part of AC-5.35 are open.
 
 1. **AC-5.1** Fresh install → setup shows identity step, then talk mode choice with nothing preselected, then the empty server list.
 2. **AC-5.2** Add the test server → connect → unknown certificate prompt appears → accept → channel tree with the desktop user is shown.
@@ -431,6 +432,21 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 | — | Screens built without a mockup on Android are approved as built; iOS keeps that look | Reviewed by the product manager, 2026-11-14 |
 | — | Local network permission is declared and requested with a one-sentence explanation before the system prompt (FR-5.8) | Found during implementation, 2026-11-14 |
 
+### 12.1 Decisions after review (2026-11-15 … 2026-11-23)
+
+Taken by the product manager while the Android app was finished. They change the requirements named in each row; the text there is already updated.
+
+| ID | Decision | Changes |
+|---|---|---|
+| D-1 | There is no theme offered by the server. "Use server theme when offered" is removed; the only per-server theme is the one the user picks for that server in the edit-server form. | FR-5.81 |
+| D-2 | iOS work is paused since 2026-11-15 until Android is finished. The remaining iOS scope is listed in the mobile repository's [`docs/ios-backlog.md`](https://github.com/Mumcord/mumcord-mobile/blob/main/docs/ios-backlog.md) (in pull request Mumcord/mumcord-mobile#29 until it is merged). TestFlight (task 10.3) waits with it. | FR-5.102, section 10, section 11, AC-5.35 |
+| D-3 | On servers without a relay, watching a stream or camera may use a direct connection that shows the IP address to the other person. Accepted as designed; the phone gets the desktop's "Direct connections" setting with the same hint. | FR-5.73, FR-5.100 |
+| D-4 | The engine follow-ups the apps need landed in Mumcord/mumcord#913: camera pause, choosing which camera tiles load and their path, phone camera availability, `UserRemoved` with actor, reason and ban flag, `comment_hash`, `set_own_avatar_bytes`, `reconnect_now`, crash recording of foreign (Kotlin and Swift) crashes that keeps only the exception types, identity import and export as bytes, a `WrongPassword` error, and the iOS `LocalNetworkBlocked` error. | FR-5.8, FR-5.40, FR-5.62, FR-5.63, FR-5.75, FR-5.80, FR-5.94, FR-5.103 |
+| D-5 | Deferred, not in Epic 5 now: a Rust crate for themes, a portrait camera picture, the hook for a hardware video encoder, keeping the public server list across app starts, keeping the activity log across connections, SuperUser rights in subchannels, the control-channel round-trip time (task E3), and keeping a whisper target across a reconnect. The Deep Ocean theme misses the contrast rule (4.40 instead of 4.5) and needs a fix in the desktop theme. | FR-5.74, section 13 |
+| D-6 | Release APK of about 41 MB (R8 and link-time optimisation). The engine libraries stay uncompressed in the APK; this is the recommendation, the final call is pending. | Section 10 |
+| D-7 | Channel tree rows are 48 dp high instead of the mockup's 44 dp, to meet the touch target rule. | Section 5 |
+| D-8 | Translations: German is complete. The other languages show mobile-only texts in English until the next desktop translation pass; `i18n/mobile/en.json` is prepared for it. | FR-5.82 |
+
 ## 13. Open points & risks
 
 - **Size of the epic (high).** Native interfaces on two platforms, a tablet layout, call integration, stream viewing and camera sharing make this by far the largest epic so far. The work is cut so that a usable app exists early: voice and chat first, then streams and camera, then transfer and polish.
@@ -451,10 +467,13 @@ Unless stated otherwise: local Docker Mumble test server, a desktop Mumcord as s
 - **Streams and camera flags of others.** The server only sends them for people in the own channel, so state icons for streams and cameras show only there (FR-5.10, FR-5.70).
 - **Android emulator.** The simulated modem occasionally loses an answered call; the end-to-end test repeats the call once.
 - **Two-step changes.** An engine change needed by mobile lands in the Mumcord repository first and reaches the apps with the next pin update.
+- **Direct connections reveal the IP address (accepted, D-3).** Without a relay on the server, watching a stream or camera can use a direct connection between the two clients, which shows each side's IP address to the other. The app asks first and offers the "Direct connections" setting.
+- **Deep Ocean contrast (found in implementation, D-5).** The built-in theme Deep Ocean reaches a contrast of 4.40 where the rule asks for 4.5. The fix belongs in the desktop theme, from which the apps take their colours. Owner: desktop.
+- **iOS paused (D-2).** About 55 % of the iOS app is built. Each round of iOS changes takes 20–40 minutes of macOS CI plus queue time; a Mac (own runner or rented) would make the remaining iOS work much faster.
 
 ## 14. Impact on the roadmap
 
-- Epic 5 becomes its own repository with its own versions; the roadmap table should link the spec and mark it as in progress.
+- Epic 5 becomes its own repository with its own versions; the roadmap table should link the spec and mark it as in progress. State on 2026-11-23: Android functionally complete (draft pull request Mumcord/mumcord-mobile#29), iOS paused at about 55 %; details in `specs/05-mobile-app-implementation.md`.
 - The mobile path named in Spec 01 (Tauri 2 mobile, Q1.7) is not taken; the engine is shared instead.
 - The Mumcord repository gains engine features for phones and the desktop "Send to your phone" dialog, to be placed in a desktop milestone.
 - Epic 6 (store releases) inherits: call integration restrictions per region, the licence question, and store review of background voice.

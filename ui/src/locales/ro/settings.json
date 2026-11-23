@@ -48,6 +48,7 @@
     "updates": "versiune nouă actualizare",
     "storage": "spațiu pe disc golește memoria cache",
     "blocked": "ignoră blochează dezactivează sunetul persoane",
+    "localMutes": "silențios silențiere mut uită pornire start",
     "notifications": "alerte ferestre pop-up",
     "externalContent": "conținut încorporat imagini previzualizări",
     "fileSharing": "fișiere trimite primește descarcă salvează folder atașament zip",
@@ -72,7 +73,8 @@
     "invalidInput": "Nu a mers: fișierul sau parola nu sunt valide.",
     "duplicateIdentity": "Această identitate este deja în lista ta.",
     "notFound": "Fișierul sau elementul nu a fost găsit.",
-    "generic": "Ceva n-a mers bine. Încearcă din nou."
+    "generic": "Ceva n-a mers bine. Încearcă din nou.",
+    "wrongPassword": "Parola nu este corectă. Verifică-o și încearcă din nou."
   },
   "identity": {
     "export": "Exportă…",
@@ -905,6 +907,11 @@
     "revokeLabel": "Revocă conversația acceptată cu {{name}}",
     "revokeFailed": "Revocarea a eșuat. Încearcă din nou."
   },
+  "localMutes": {
+    "title": "Silențieri locale",
+    "switch": "Uită silențierile locale la pornirea Mumcord",
+    "hint": "Persoanele pe care le-ai silențiat doar pentru tine vor fi din nou audibile după o repornire. Volumele și utilizatorii blocați sunt păstrați."
+  },
   "blocked": {
     "title": "Utilizatori blocați",
     "hint": "Blocările sunt păstrate doar pe acest computer. Pentru tine, utilizatorii blocați au sunetul dezactivat, iar mesajele și datele lor Mumcord sunt ignorate.",
@@ -956,7 +963,10 @@
     "channel": "Canal de actualizări",
     "channelHint": "Alege ce versiuni oferă Mumcord. Versiunile candidat sunt build-uri timpurii ale următoarei versiuni.",
     "channels": {
-      "stable": { "name": "Stabilă", "hint": "Doar versiuni finale" },
+      "stable": {
+        "name": "Stabilă",
+        "hint": "Doar versiuni finale"
+      },
       "releaseCandidates": {
         "name": "Versiuni candidat",
         "hint": "Build-uri timpurii ale următoarei versiuni; pot conține erori"

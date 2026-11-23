@@ -48,6 +48,7 @@
     "updates": "nieuwe versie upgrade",
     "storage": "schijfruimte cache wissen",
     "blocked": "negeren blokkeren dempen mensen",
+    "localMutes": "dempen gedempt demping vergeten opstarten start",
     "notifications": "meldingen pop-ups",
     "externalContent": "insluitingen afbeeldingen voorbeelden",
     "fileSharing": "bestanden versturen ontvangen downloaden opslaan map bijlage zip",
@@ -70,7 +71,8 @@
     "invalidInput": "Dat is mislukt: het bestand of wachtwoord is ongeldig.",
     "duplicateIdentity": "Deze identiteit staat al in je lijst.",
     "notFound": "Het bestand of item is niet gevonden.",
-    "generic": "Er is iets misgegaan. Probeer het opnieuw."
+    "generic": "Er is iets misgegaan. Probeer het opnieuw.",
+    "wrongPassword": "Het wachtwoord klopt niet. Controleer het en probeer het opnieuw."
   },
   "identity": {
     "export": "Exporteren…",
@@ -899,6 +901,11 @@
     "revokeLabel": "Het geaccepteerde gesprek met {{name}} intrekken",
     "revokeFailed": "Intrekken mislukt. Probeer het opnieuw."
   },
+  "localMutes": {
+    "title": "Lokale dempingen",
+    "switch": "Lokale dempingen vergeten als Mumcord start",
+    "hint": "Mensen die je alleen voor jezelf hebt gedempt, zijn na een herstart weer hoorbaar. Volumes en geblokkeerde gebruikers blijven bewaard."
+  },
   "blocked": {
     "title": "Geblokkeerde gebruikers",
     "hint": "Blokkades worden alleen op deze computer bewaard. Geblokkeerde gebruikers zijn voor jou gedempt en hun berichten en Mumcord-gegevens worden genegeerd.",
@@ -950,7 +957,10 @@
     "channel": "Updatekanaal",
     "channelHint": "Kies welke versies Mumcord aanbiedt. Release candidates zijn vroege builds van de volgende versie.",
     "channels": {
-      "stable": { "name": "Stabiel", "hint": "Alleen definitieve versies" },
+      "stable": {
+        "name": "Stabiel",
+        "hint": "Alleen definitieve versies"
+      },
       "releaseCandidates": {
         "name": "Release candidates",
         "hint": "Vroege builds van de volgende versie; kunnen bugs bevatten"

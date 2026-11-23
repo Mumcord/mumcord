@@ -402,7 +402,13 @@ describe("announcements", () => {
 
     vi.setSystemTime(6000);
     act(() => {
-      api.mock.emit("userRemoved", { serverId: 1, session: 3 });
+      api.mock.emit("userRemoved", {
+        serverId: 1,
+        session: 3,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(heard.at(-1)?.message).toBe("Ben left your channel");
 

@@ -197,7 +197,9 @@
     "viewing": "Skaties",
     "weak": "Vājš savienojums",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Šai kamerai nepieciešams Mumcord 0.9.0"
+    "needsUpdate": "Šai kamerai nepieciešams Mumcord 0.9.0",
+    "paused": "{{name}} apturēja kameru",
+    "pausedLabel": ", kamera apturēta"
   },
   "tileMenu": {
     "options": "{{name}} opcijas",

@@ -858,6 +858,9 @@ pub struct Settings {
     pub private_messages: PrivateMessageSettings,
     /// Channel messages of blocked users: collapsed (default) or hidden (issue #140).
     pub blocked_messages: BlockedMessages,
+    /// "Forget local mutes when Mumcord starts" (default off; FR-15.1). Takes effect from
+    /// the next app start; turning it on clears nothing immediately (FR-15.5).
+    pub forget_local_mutes_on_start: bool,
     /// Accept files offered by others (Settings → Files).
     pub files_receive: bool,
     pub files_max_size: FilesMaxSize,
@@ -1037,6 +1040,7 @@ impl Settings {
             setup_preset: s.setup_preset.map(Into::into),
             private_messages: (&s.private_messages).into(),
             blocked_messages: s.blocked_messages.into(),
+            forget_local_mutes_on_start: s.forget_local_mutes_on_start,
             files_receive: s.files_receive,
             files_max_size: s.files_max_size.into(),
             files_save_folder: s.files_save_folder.clone(),
@@ -1210,6 +1214,7 @@ impl Settings {
         s.setup_preset = self.setup_preset.map(Into::into);
         s.private_messages = (&self.private_messages).into();
         s.blocked_messages = self.blocked_messages.into();
+        s.forget_local_mutes_on_start = self.forget_local_mutes_on_start;
         s.files_receive = self.files_receive;
         s.files_max_size = self.files_max_size.into();
         // `files_save_folder` keeps the stored value: only `files_save_folder_choose` (a Rust-side

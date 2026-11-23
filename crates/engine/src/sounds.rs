@@ -483,7 +483,7 @@ impl Tracker {
                     _ => None,
                 }
             }
-            EngineEvent::UserRemoved(session) => {
+            EngineEvent::UserRemoved { session, .. } => {
                 let was_deaf = self.own_deaf();
                 let own_channel = self.own_channel();
                 let removed = self.users.remove(session)?;
@@ -840,6 +840,7 @@ mod tests {
             has_avatar: false,
             avatar_hash: None,
             has_comment: false,
+            comment_hash: None,
             volume: 100,
             local_mute: false,
             share_volume: 100,
@@ -916,9 +917,28 @@ mod tests {
             Some(Sound::UserLeft)
         );
         assert_eq!(sound(&mut t, up(user(4, 11, false, false))), None);
-        assert_eq!(sound(&mut t, EngineEvent::UserRemoved(4)), None);
         assert_eq!(
-            sound(&mut t, EngineEvent::UserRemoved(2)),
+            sound(
+                &mut t,
+                EngineEvent::UserRemoved {
+                    session: 4,
+                    actor: None,
+                    reason: None,
+                    ban: false
+                }
+            ),
+            None
+        );
+        assert_eq!(
+            sound(
+                &mut t,
+                EngineEvent::UserRemoved {
+                    session: 2,
+                    actor: None,
+                    reason: None,
+                    ban: false
+                }
+            ),
             Some(Sound::UserLeft)
         );
         assert_eq!(
@@ -1016,7 +1036,12 @@ mod tests {
         hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, true)));
         assert_eq!(log.lock().unwrap().len(), 1, "deafen cue itself plays");
         hub.observe(&EngineEvent::UserUpserted(user(3, 10, false, false)));
-        hub.observe(&EngineEvent::UserRemoved(2));
+        hub.observe(&EngineEvent::UserRemoved {
+            session: 2,
+            actor: None,
+            reason: None,
+            ban: false,
+        });
         hub.play(Sound::Message);
         assert_eq!(log.lock().unwrap().len(), 1, "nothing while deafened");
         hub.observe(&EngineEvent::UserUpserted(user(1, 10, true, false)));

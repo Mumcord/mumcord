@@ -17,7 +17,11 @@
     "watchPartyStopped": "pārtrauca kopīgu skatīšanos",
     "pluginActivityStarted": "sāka {{plugin}}",
     "pluginActivityStopped": "pārtrauca {{plugin}}",
-    "pluginEvent": "„{{text}}”"
+    "pluginEvent": "„{{text}}”",
+    "kicked": "tika izmests",
+    "banned": "tika bloķēts",
+    "kickedBy": "tika izmests (izmeta {{name}})",
+    "bannedBy": "tika bloķēts (bloķēja {{name}})"
   },
   "channel": "# {{channel}}",
   "plugin": "spraudnis",

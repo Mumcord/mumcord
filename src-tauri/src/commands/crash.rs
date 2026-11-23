@@ -28,7 +28,7 @@ pub fn crash_dir(logs: &Path) -> PathBuf {
 /// Starts crash reporting for this run (called before the engine opens).
 pub fn install(logs: &Path, version: &str) {
     let dir = crash_dir(logs);
-    if let Err(e) = crash::install(&dir, version) {
+    if let Err(e) = crash::install(&dir, version, &[]) {
         eprintln!("crash reports unavailable: {e}");
     }
     let _ = DIRS.set(Dirs {
@@ -79,6 +79,8 @@ impl From<crash::CrashSummary> for CrashReport {
             crash::CrashKind::Overrun => (CrashKind::Signal, Some("SIGXCPU".to_owned())),
             // The list has no chip of its own for a freeze yet; the cause line says what it is.
             crash::CrashKind::Freeze => (CrashKind::Unexpected, None),
+            // Only the phone apps record these; listed like a panic of the app.
+            crash::CrashKind::Foreign => (CrashKind::Panic, None),
         };
         Self {
             id: s.id,

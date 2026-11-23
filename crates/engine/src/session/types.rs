@@ -255,6 +255,10 @@ pub struct UserView {
     /// Hex of the avatar texture hash, when the server sent one; changes when the avatar is replaced.
     pub avatar_hash: Option<String>,
     pub has_comment: bool,
+    /// Hex SHA-1 of the comment, as Mumble hashes it: the server's hash when it sent only that,
+    /// computed from the text when it sent the comment itself. Changes whenever the comment
+    /// changes; `None` without a comment.
+    pub comment_hash: Option<String>,
     /// Local voice volume in percent (0–200).
     pub volume: u16,
     pub local_mute: bool,
@@ -567,7 +571,17 @@ pub enum EngineEvent {
     ChannelsUpserted(Vec<ChannelView>),
     ChannelRemoved(u32),
     UserUpserted(UserView),
-    UserRemoved(u32),
+    /// A person left the server, from the standard `UserRemove` message.
+    UserRemoved {
+        session: u32,
+        /// Who kicked or banned them; `None` when they left on their own or the server removed
+        /// them without naming anyone.
+        actor: Option<u32>,
+        /// The reason the kicker gave (untrusted plain text from the server).
+        reason: Option<String>,
+        /// A ban rather than a kick.
+        ban: bool,
+    },
     TalkStateChanged {
         session: u32,
         talking: bool,

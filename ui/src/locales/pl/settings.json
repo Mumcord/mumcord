@@ -48,6 +48,7 @@
     "updates": "nowa wersja aktualizacja",
     "storage": "miejsce na dysku wyczyść pamięć podręczną",
     "blocked": "ignoruj blokuj wycisz osoby",
+    "localMutes": "wycisz wyciszenie wyciszony zapomnij start uruchomienie",
     "notifications": "powiadomienia wyskakujące okna",
     "externalContent": "osadzone treści obrazy podglądy",
     "fileSharing": "pliki wyślij odbierz pobierz zapisz folder załącznik zip",
@@ -74,7 +75,8 @@
     "invalidInput": "To się nie udało: plik lub hasło jest nieprawidłowe.",
     "duplicateIdentity": "Ta tożsamość jest już na twojej liście.",
     "notFound": "Nie znaleziono pliku lub elementu.",
-    "generic": "Coś poszło nie tak. Spróbuj ponownie."
+    "generic": "Coś poszło nie tak. Spróbuj ponownie.",
+    "wrongPassword": "Hasło jest nieprawidłowe. Sprawdź je i spróbuj ponownie."
   },
   "identity": {
     "export": "Eksportuj…",
@@ -911,6 +913,11 @@
     "revokeLabel": "Cofnij zaakceptowaną rozmowę z {{name}}",
     "revokeFailed": "Cofnięcie nie powiodło się. Spróbuj ponownie."
   },
+  "localMutes": {
+    "title": "Lokalne wyciszenia",
+    "switch": "Zapominaj lokalne wyciszenia przy starcie Mumcord",
+    "hint": "Osoby, które wyciszyłeś(-aś) tylko dla siebie, będą znów słyszalne po ponownym uruchomieniu. Głośności i zablokowani użytkownicy zostają zachowani."
+  },
   "blocked": {
     "title": "Zablokowani użytkownicy",
     "hint": "Blokady są przechowywane tylko na tym komputerze. Zablokowani użytkownicy są dla ciebie wyciszeni, a ich wiadomości i dane Mumcorda są ignorowane.",
@@ -962,7 +969,10 @@
     "channel": "Kanał aktualizacji",
     "channelHint": "Wybierz, które wersje oferuje Mumcord. Wersje kandydujące to wczesne kompilacje następnej wersji.",
     "channels": {
-      "stable": { "name": "Stabilna", "hint": "Tylko wersje finalne" },
+      "stable": {
+        "name": "Stabilna",
+        "hint": "Tylko wersje finalne"
+      },
       "releaseCandidates": {
         "name": "Wersje kandydujące",
         "hint": "Wczesne kompilacje następnej wersji; mogą zawierać błędy"

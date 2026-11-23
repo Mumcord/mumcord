@@ -48,6 +48,7 @@
     "updates": "nuova versione aggiornamento",
     "storage": "spazio su disco svuota cache",
     "blocked": "ignora blocca silenzia persone",
+    "localMutes": "mute silenzia silenziato dimentica avvio",
     "notifications": "avvisi popup",
     "externalContent": "incorporamenti immagini anteprime",
     "fileSharing": "file invia ricevi scarica salva cartella allegato zip",
@@ -72,7 +73,8 @@
     "invalidInput": "Non ha funzionato: il file o la password non sono validi.",
     "duplicateIdentity": "Questa identità è già nell'elenco.",
     "notFound": "Impossibile trovare il file o l'elemento.",
-    "generic": "Qualcosa è andato storto. Riprova."
+    "generic": "Qualcosa è andato storto. Riprova.",
+    "wrongPassword": "La password non è corretta. Controllala e riprova."
   },
   "identity": {
     "export": "Esporta…",
@@ -905,6 +907,11 @@
     "revokeLabel": "Revoca la conversazione accettata con {{name}}",
     "revokeFailed": "Revoca non riuscita. Riprova."
   },
+  "localMutes": {
+    "title": "Mute locali",
+    "switch": "Dimentica i mute locali all’avvio di Mumcord",
+    "hint": "Le persone che hai silenziato solo per te tornano udibili dopo un riavvio. I volumi e gli utenti bloccati restano invariati."
+  },
   "blocked": {
     "title": "Utenti bloccati",
     "hint": "I blocchi sono conservati solo su questo computer. Gli utenti bloccati sono silenziati per te e i loro messaggi e dati Mumcord vengono ignorati.",
@@ -956,7 +963,10 @@
     "channel": "Canale di aggiornamento",
     "channelHint": "Scegli quali versioni offre Mumcord. Le release candidate sono build iniziali della prossima versione.",
     "channels": {
-      "stable": { "name": "Stabile", "hint": "Solo versioni finali" },
+      "stable": {
+        "name": "Stabile",
+        "hint": "Solo versioni finali"
+      },
       "releaseCandidates": {
         "name": "Release candidate",
         "hint": "Build iniziali della prossima versione; possono contenere errori"

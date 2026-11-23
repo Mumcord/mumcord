@@ -1,7 +1,8 @@
 # Epic 5 – Android and iOS app · Task list
 
-> Spec: `specs/05-mobile-app-specification.md` · As of: 2026-11-14 · Only the team lead edits this file.
-> Status values: `open` / `in progress` / `done` / `blocked`. Complexity follows the rule in `.claude/skills/dev/SKILL.md`.
+> Spec: `specs/05-mobile-app-specification.md` · As of: 2026-11-23 · Only the team lead edits this file.
+> Status values: `open` / `in progress` / `done` / `blocked` / `paused` / `deferred`. `paused`: iOS work stopped on 2026-11-15 until Android is finished (spec decision D-2); what is left is listed in the mobile repository's `docs/ios-backlog.md`. `deferred`: taken out of Epic 5 for now (spec decision D-5).
+> Implementation report: `specs/05-mobile-app-implementation.md`. Complexity follows the rule in `.claude/skills/dev/SKILL.md`.
 
 ## Intro
 
@@ -141,9 +142,9 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 | 2.6 | iOS: same scope as 2.4 and 2.5 | done | b2-6-ios-screens | complex | FR-5.1 … FR-5.14, m#5, m#6 | mumcord-mobile · `ios/Mumcord/**` |
 | 2.7 | Local network permission: explanation, system prompt, denied state, on Android and iOS | done | b2-7a-localnet-android; iOS half in b3-6-ios-voice | complex | FR-5.8, AC-5.37 | mumcord-mobile · `android/app` (connect flow), `ios/Mumcord/**` |
 | 2.8 | Bridge: banned connection error | done | b2-1-bridge | simple | FR-5.7 | mumcord-mobile · `bridge/**` |
-| 2.9 | Android: public server browser ("Find more" on the server list, searchable list, filters, ping of visible entries, add to server list, last list kept on failed refresh); bridge access to the engine's public server list | open | | 2.4 | complex | FR-5.9, m#5 | mumcord-mobile · `bridge/**`, `android/app` (servers) |
-| 2.10 | iOS: public server browser, scope of 2.9 | open | | 2.9 | complex | FR-5.9, m#5 | mumcord-mobile · `ios/**` |
-| V2 | Verification on emulator and simulator | open | | 2.5, 2.6, 2.7, 2.8, 2.9, 2.10 | simple | AC-5.1, AC-5.2, AC-5.3, AC-5.4, AC-5.29, AC-5.32, AC-5.37, AC-5.38 | mumcord-mobile · `e2e/**` |
+| 2.9 | Android: public server browser ("Find more" on the server list, searchable list, filters, ping of visible entries, add to server list, last list kept on failed refresh); bridge access to the engine's public server list | done | | 2.4 | complex | FR-5.9, m#5 | mumcord-mobile · `bridge/**`, `android/app` (servers) |
+| 2.10 | iOS: public server browser, scope of 2.9 | paused | | 2.9 | complex | FR-5.9, m#5 | mumcord-mobile · `ios/**` |
+| V2 | Verification on emulator and simulator | done (Android); iOS half paused | | 2.5, 2.6, 2.7, 2.8, 2.9, 2.10 | simple | AC-5.1, AC-5.2, AC-5.3, AC-5.4, AC-5.29, AC-5.32, AC-5.37, AC-5.38 | mumcord-mobile · `e2e/**` |
 
 ## Phase 3 – Voice
 
@@ -155,7 +156,7 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 | 3.4 | Android: talk mode choice, voice bar, full voice view, hold-to-talk, person sheet volume and mute for me | done | b3-4-android-voice-ui | complex | FR-5.20 … FR-5.23, FR-5.12, m#7 | mumcord-mobile · `android/app` (voice) |
 | 3.5 | Android: whisper and shout bar | done | b3-4-android-voice-ui | simple | FR-5.24, m#18 | mumcord-mobile · `android/app` (whisper) |
 | 3.6 | iOS: audio module (voice-chat audio session) and the scope of 3.4 and 3.5 | done | b3-6-ios-voice | complex | FR-5.20 … FR-5.26, m#7, m#18 | mumcord-mobile · `ios/**` |
-| V3 | Verification with injected audio and a bot as listener; flags what needs a manual listening check | open | | 3.5, 3.6 | complex | AC-5.5, AC-5.6, AC-5.7, AC-5.14, AC-5.15, AC-5.36 (re-run after 3.1) | both · `e2e/**` |
+| V3 | Verification with injected audio and a bot as listener; flags what needs a manual listening check | done (Android); iOS half paused | | 3.5, 3.6 | complex | AC-5.5, AC-5.6, AC-5.7, AC-5.14, AC-5.15, AC-5.36 (re-run after 3.1) | both · `e2e/**` |
 
 ## Phase 4 – Background, call integration, routing, network, battery
 
@@ -163,10 +164,10 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 |---|---|---|---|---|---|---|---|
 | 4.1 | Android: foreground service and self-managed call, call-style notification with Mute, Deafen, Leave, no recent-calls entry, notice after the system ended the app | done | b4-1-android-call | complex | FR-5.30 … FR-5.32, FR-5.37, m#8 | mumcord-mobile · `android/platform/call/**` |
 | 4.2 | Android: phone call handling (mute and deafen, restore), other audio interruptions | done | b4-1-android-call | complex | FR-5.33, FR-5.36, m#8 | mumcord-mobile · `android/platform/call/**`, `audio/**` |
-| 4.3 | Android: audio output choice, first-connect question, output sheet, headset button with feedback sound | open | | 4.1 | complex | FR-5.34, FR-5.35, m#9 | mumcord-mobile · `android/platform/audio/**`, voice view |
-| 4.4 | Bridge and Android: network change reconnect, mobile data switches, idle disconnect with warning notification, no periodic work when idle | open | | 4.1 | complex | FR-5.40 … FR-5.43, m#10 | mumcord-mobile · `bridge/**`, `android/app` |
-| 4.5 | iOS: system call integration, audio session interruptions, routing, headset button, and the scope of 4.4 | open | | 4.4 | complex | FR-5.30 … FR-5.43, m#8, m#9, m#10 | mumcord-mobile · `ios/**` |
-| V4 | Verification: emulator and simulator where possible (simulated incoming call, network switch, shortened idle timer); the rest goes on the device checklist | open | | 4.3, 4.5 | complex | AC-5.8, AC-5.9, AC-5.10, AC-5.11, AC-5.12, AC-5.13, AC-5.30 | mumcord-mobile · `e2e/**`, `docs/device-checklist.md` |
+| 4.3 | Android: audio output choice, first-connect question, output sheet, headset button with feedback sound | done | | 4.1 | complex | FR-5.34, FR-5.35, m#9 | mumcord-mobile · `android/platform/audio/**`, voice view |
+| 4.4 | Bridge and Android: network change reconnect, mobile data switches, idle disconnect with warning notification, no periodic work when idle | done | | 4.1 | complex | FR-5.40 … FR-5.43, m#10 | mumcord-mobile · `bridge/**`, `android/app` |
+| 4.5 | iOS: system call integration, audio session interruptions, routing, headset button, and the scope of 4.4 | done | | 4.4 | complex | FR-5.30 … FR-5.43, m#8, m#9, m#10 | mumcord-mobile · `ios/**` |
+| V4 | Verification: emulator and simulator where possible (simulated incoming call, network switch, shortened idle timer); the rest goes on the device checklist | done (Android, emulator part); real-phone part on the device checklist; iOS half paused | | 4.3, 4.5 | complex | AC-5.8, AC-5.9, AC-5.10, AC-5.11, AC-5.12, AC-5.13, AC-5.30 | mumcord-mobile · `e2e/**`, `docs/device-checklist.md` |
 
 ## Phase 5 – Chat, private messages, notifications
 
@@ -174,9 +175,9 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 |---|---|---|---|---|---|---|---|
 | 5.1 | Bridge: chat, history, images, GIF favourites, mentions, replies, private conversations, message requests, blocking | done | b5-1-bridge-chat | complex | FR-5.50 … FR-5.53, m#3, m#11, m#12 | mumcord-mobile · `bridge/**` |
 | 5.2 | Android: Chat tab (sanitised rendering, links, inline images and GIFs, replies, mentions, sending text, images, GIF favourites) | done | b5-2-android-chat | complex | FR-5.50, FR-5.51, FR-5.53, m#11 | mumcord-mobile · `android/app` (chat) |
-| 5.3 | Android: Messages tab, requests, blocking, notifications while connected, "Show sender only" | open | | 5.2 | complex | FR-5.52, FR-5.54 … FR-5.56, m#12 | mumcord-mobile · `android/app` (messages), `platform/notify/**` |
-| 5.4 | iOS: scope of 5.2 and 5.3 | open | | 5.3 | complex | FR-5.50 … FR-5.56, m#11, m#12 | mumcord-mobile · `ios/**` |
-| V5 | Verification | open | | 5.3, 5.4 | simple | AC-5.16, AC-5.17, AC-5.18, AC-5.19 | mumcord-mobile · `e2e/**` |
+| 5.3 | Android: Messages tab, requests, blocking, notifications while connected, "Show sender only" | done | | 5.2 | complex | FR-5.52, FR-5.54 … FR-5.56, m#12 | mumcord-mobile · `android/app` (messages), `platform/notify/**` |
+| 5.4 | iOS: scope of 5.2 and 5.3 | done | | 5.3 | complex | FR-5.50 … FR-5.56, m#11, m#12 | mumcord-mobile · `ios/**` |
+| V5 | Verification | done (Android); iOS half paused | | 5.3, 5.4 | simple | AC-5.16, AC-5.17, AC-5.18, AC-5.19 | mumcord-mobile · `e2e/**` |
 
 ## Phase 6 – Identities and QR transfer
 
@@ -184,67 +185,76 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 |---|---|---|---|---|---|---|---|
 | 6.1 | Engine: transfer format (payload, compression, slow key derivation from the 8-digit code, encryption, split into numbered parts, 2-minute validity) with tests; used by desktop to create and by the bridge to read | done | b6-1-transfer-format | complex | FR-5.64 … FR-5.67, m#14, m#15 | Mumcord · new module in `crates/store` or `crates/engine` (decided in the task plan) |
 | 6.2 | Desktop: "Send to your phone" dialog in the identity settings, per mockup, with dark and light screenshots and a CHANGELOG entry | done | | 6.1 | complex | FR-5.64, FR-5.67, m#14 | Mumcord · `src-tauri/src/commands/` (new command file), `ui/src/features/settings` identity area, `ui/src/locales` |
-| 6.3 | Bridge and Android: identities (create, import `.p12`, export, delete rules, default) | open | | V2 | complex | FR-5.60 … FR-5.63, m#13 | mumcord-mobile · `bridge/**`, `android/app` (identities) |
-| 6.4 | Android: QR scanner, progress, code entry with three attempts, preview and import of identities and server list | open | | 6.1, 6.3 | complex | FR-5.65, FR-5.66, m#15 | mumcord-mobile · `android/app` (transfer) |
-| 6.5 | iOS: scope of 6.3 and 6.4 | open | | 6.4 | complex | FR-5.60 … FR-5.66, m#13, m#15 | mumcord-mobile · `ios/**` |
-| V6 | Verification, including the desktop end-to-end run after 6.2 | open | | 6.2, 6.4, 6.5 | complex | AC-5.20, AC-5.21, AC-5.36 (re-run) | both · `e2e/**` |
+| 6.3 | Bridge and Android: identities (create, import `.p12`, export, delete rules, default) | done | | V2 | complex | FR-5.60 … FR-5.63, m#13 | mumcord-mobile · `bridge/**`, `android/app` (identities) |
+| 6.4 | Android: QR scanner, progress, code entry with three attempts, preview and import of identities and server list | done | | 6.1, 6.3 | complex | FR-5.65, FR-5.66, m#15 | mumcord-mobile · `android/app` (transfer) |
+| 6.5 | iOS: scope of 6.3 and 6.4 | done | | 6.4 | complex | FR-5.60 … FR-5.66, m#13, m#15 | mumcord-mobile · `ios/**` |
+| V6 | Verification, including the desktop end-to-end run after 6.2 | done (Android; the `.p12` import of AC-5.20 only instrumented); iOS half paused | | 6.2, 6.4, 6.5 | complex | AC-5.20, AC-5.21, AC-5.36 (re-run) | both · `e2e/**` |
 
 ## Phase 7 – Streams and camera
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|
-| 7.1 | Cross-built libvpx and dav1d for the Android and iOS targets, cached in CI; engine built with `vp9` and `av1-decode` | open | | V1.2 | complex | section 6 streams, m#16 | mumcord-mobile · `scripts/build-codecs-*.sh`, workflows |
-| 7.2 | Bridge: stream state, start/stop watching, decoded frames to a `VideoSink`, stream volume, reachability; direct path and relay on phone networks | open | | 7.1 | complex | FR-5.70 … FR-5.73, m#16 | mumcord-mobile · `bridge/**`; Mumcord `crates/p2p` only if a phone fix is needed |
-| 7.3 | Android: live tile, tap-to-watch on mobile data, full screen with rotation, floating mini window, system picture-in-picture, hardware decoding where the phone supports the codec | open | | 7.2 | complex | FR-5.70 … FR-5.73, FR-5.76, FR-5.41, m#16 | mumcord-mobile · `android/app` (streams), `platform/video/**` |
-| 7.4 | Bridge and Android: camera sharing (preview sheet, front/back, 540p30 cap, VP9 hardware or software fallback, pause in background) | open | | 7.3 | complex | FR-5.74, FR-5.75, m#17 | mumcord-mobile · `bridge/**`, `android/platform/camera/**`, `android/app` (camera) |
-| 7.5 | iOS: scope of 7.3 and 7.4 | open | | 7.4 | complex | FR-5.70 … FR-5.76, m#16, m#17 | mumcord-mobile · `ios/**` |
-| V7 | Verification; early measurement of software AV1 decoding load for the open risk in spec section 13 | open | | 7.4, 7.5 | complex | AC-5.22, AC-5.23, AC-5.24 | mumcord-mobile · `e2e/**` |
+| 7.1 | Cross-built libvpx and dav1d for the Android and iOS targets, cached in CI; engine built with `vp9` and `av1-decode` | done | | V1.2 | complex | section 6 streams, m#16 | mumcord-mobile · `scripts/build-codecs-*.sh`, workflows |
+| 7.2 | Bridge: stream state, start/stop watching, decoded frames to a `VideoSink`, stream volume, reachability; direct path and relay on phone networks | done | | 7.1 | complex | FR-5.70 … FR-5.73, m#16 | mumcord-mobile · `bridge/**`; Mumcord `crates/p2p` only if a phone fix is needed |
+| 7.3 | Android: live tile, tap-to-watch on mobile data, full screen with rotation, floating mini window, system picture-in-picture, hardware decoding where the phone supports the codec | done | | 7.2 | complex | FR-5.70 … FR-5.73, FR-5.76, FR-5.41, m#16 | mumcord-mobile · `android/app` (streams), `platform/video/**` |
+| 7.4 | Bridge and Android: camera sharing (preview sheet, front/back, 540p30 cap, VP9 hardware or software fallback, pause in background) | done | | 7.3 | complex | FR-5.74, FR-5.75, m#17 | mumcord-mobile · `bridge/**`, `android/platform/camera/**`, `android/app` (camera) |
+| 7.5 | iOS: scope of 7.3 and 7.4 | paused | | 7.4 | complex | FR-5.70 … FR-5.76, m#16, m#17 | mumcord-mobile · `ios/**` |
+| V7 | Verification; early measurement of software AV1 decoding load for the open risk in spec section 13 | in progress (Android: AC-5.24 waits for the paused camera state of #913 in the app; the AV1 decoding load is measured on the device checklist); iOS half paused | | 7.4, 7.5 | complex | AC-5.22, AC-5.23, AC-5.24 | mumcord-mobile · `e2e/**` |
 
 ## Phase 8 – Profile, themes, languages, moderation, activity, settings
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|
-| 8.1 | Translations: script from the desktop translation files to Android and iOS resources; mobile-only texts added to the desktop files | open | | V2 | complex | FR-5.82, m#21 | mumcord-mobile · `i18n/**`; Mumcord · `ui/src/locales` (new keys only) |
-| 8.2 | Bridge: profile, themes and theme codes, moderation actions and permissions, activity log, remaining settings | open | | V5 | complex | FR-5.80, FR-5.81, FR-5.90 … FR-5.94, FR-5.100, m#3 | mumcord-mobile · `bridge/**` |
-| 8.3 | Android: edit profile, appearance and theme gallery, language override | open | | 8.1, 8.2 | complex | FR-5.80 … FR-5.82, m#21 | mumcord-mobile · `android/app` (profile, themes) |
-| 8.4 | Android: moderation section in the person sheet (move, server mute, kick, ban) | open | | 8.2 | simple | FR-5.90 … FR-5.93, m#19 | mumcord-mobile · `android/app` (moderation) |
-| 8.5 | Android: More tab, activity log, settings screens | open | | 8.2 | complex | FR-5.94, FR-5.100, m#20, m#22 | mumcord-mobile · `android/app` (more, settings, activity) |
-| 8.6 | iOS: scope of 8.3 to 8.5 | open | | 8.5 | complex | FR-5.80 … FR-5.100, m#19 … m#22 | mumcord-mobile · `ios/**` |
-| V8 | Verification | open | | 8.3 … 8.6 | simple | AC-5.25, AC-5.26, AC-5.27, AC-5.28 | mumcord-mobile · `e2e/**` |
+| 8.1 | Translations: script from the desktop translation files to Android and iOS resources; mobile-only texts added to the desktop files | done (Android; the iOS half is in 8.6) | | V2 | complex | FR-5.82, m#21 | mumcord-mobile · `i18n/**`; Mumcord · `ui/src/locales` (new keys only) |
+| 8.2 | Bridge: profile, themes and theme codes, moderation actions and permissions, activity log, remaining settings | done | | V5 | complex | FR-5.80, FR-5.81, FR-5.90 … FR-5.94, FR-5.100, m#3 | mumcord-mobile · `bridge/**` |
+| 8.3 | Android: edit profile, appearance and theme gallery, language override | done | | 8.1, 8.2 | complex | FR-5.80 … FR-5.82, m#21 | mumcord-mobile · `android/app` (profile, themes) |
+| 8.4 | Android: moderation section in the person sheet (move, server mute, kick, ban) | done | | 8.2 | simple | FR-5.90 … FR-5.93, m#19 | mumcord-mobile · `android/app` (moderation) |
+| 8.5 | Android: More tab, activity log, settings screens | done | | 8.2 | complex | FR-5.94, FR-5.100, m#20, m#22 | mumcord-mobile · `android/app` (more, settings, activity) |
+| 8.6 | iOS: scope of 8.3 to 8.5 | paused | | 8.5 | complex | FR-5.80 … FR-5.100, m#19 … m#22 | mumcord-mobile · `ios/**` |
+| V8 | Verification | done (Android); iOS half paused | | 8.3 … 8.6 | simple | AC-5.25, AC-5.26, AC-5.27, AC-5.28 | mumcord-mobile · `e2e/**` |
 
 ## Phase 9 – Tablet and accessibility
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|
-| 9.1 | Android: two-column tablet layout with navigation rail, stream in the right column | open | | V7, V8 | complex | section 5 tablet, FR-5.71, m#23 | mumcord-mobile · `android/app` (layout) |
-| 9.2 | iOS: tablet layout | open | | 9.1 | complex | section 5 tablet, m#23 | mumcord-mobile · `ios/**` |
-| 9.3 | Android: screen-reader labels, focus order, talking announcements, 200 % text, reduced motion, touch target sizes | open | | 9.1 | complex | section 5 accessibility, m#24 | mumcord-mobile · `android/app` |
-| 9.4 | iOS: same accessibility scope | open | | 9.2 | complex | section 5 accessibility, m#24 | mumcord-mobile · `ios/**` |
-| V9 | Verification (automated accessibility checks plus manual TalkBack / VoiceOver pass on the checklist) | open | | 9.3, 9.4 | simple | AC-5.31, AC-5.33 | mumcord-mobile · `e2e/**` |
+| 9.1 | Android: two-column tablet layout with navigation rail, stream in the right column | done | | V7, V8 | complex | section 5 tablet, FR-5.71, m#23 | mumcord-mobile · `android/app` (layout) |
+| 9.2 | iOS: tablet layout | paused | | 9.1 | complex | section 5 tablet, m#23 | mumcord-mobile · `ios/**` |
+| 9.3 | Android: screen-reader labels, focus order, talking announcements, 200 % text, reduced motion, touch target sizes | done | | 9.1 | complex | section 5 accessibility, m#24 | mumcord-mobile · `android/app` |
+| 9.4 | iOS: same accessibility scope | paused | | 9.2 | complex | section 5 accessibility, m#24 | mumcord-mobile · `ios/**` |
+| V9 | Verification (automated accessibility checks plus manual TalkBack / VoiceOver pass on the checklist) | done (Android, automated); TalkBack pass on the device checklist; iOS half paused | | 9.3, 9.4 | simple | AC-5.31, AC-5.33 | mumcord-mobile · `e2e/**` |
 
 ## Phase 10 – Releases, end-to-end tests, device checklist, wrap-up
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|
-| 10.1 | Android release workflow: signed APK from CI secrets, checksum, SBOM, third-party notices, release notes naming the engine version | open | | V2 | complex | section 10, m#25 | mumcord-mobile · `.github/workflows/release.yml`, `RELEASING.md` |
-| 10.2 | Android: daily update check with notice and switch; opt-in crash reports; About screen with engine version and licences | open | | 10.1, 8.5 | complex | FR-5.101, FR-5.103, FR-5.100, m#25 | mumcord-mobile · `bridge/**`, `android/app` |
-| 10.3 | iOS release workflow: signed build on macOS runner, TestFlight upload, About screen | open | | V2 | complex | FR-5.102, section 10, m#26 | mumcord-mobile · `.github/workflows/release.yml` (iOS job), `ios/**` |
-| 10.4 | End-to-end suite complete and running in CI on the Android emulator and the iOS simulator against the local test server with a bot | open | | V9 | complex | section 10, m#27 | mumcord-mobile · `e2e/**`, `.github/workflows/e2e.yml` |
-| 10.5 | Manual device checklist document per release, including battery and data measurements of section 9 | open | | V4 | simple | section 9, section 10, m#28 | mumcord-mobile · `docs/device-checklist.md` |
-| 10.6 | Roadmap and docs: roadmap table links the spec and marks Epic 5, README of both repositories | open | | 10.1, 10.3 | simple | section 14 | Mumcord · `specs/roadmap.md`, `README.md`; mumcord-mobile · `README.md` |
-| V10 | Verification: upgrade install keeps data, update notice, tagged test release produces APK with checksum and a TestFlight build, no secret in the repository | open | | 10.2, 10.3, 10.4 | complex | AC-5.34, AC-5.35 | mumcord-mobile · report only |
-| D1 | Implementation report `specs/05-mobile-app-implementation.md` (report template of `/dev`), result per AC-5.1 … AC-5.38, open manual checks | open | | all V tasks | simple | all AC | Mumcord · `specs/05-mobile-app-implementation.md` |
+| 10.1 | Android release workflow: signed APK from CI secrets, checksum, SBOM, third-party notices, release notes naming the engine version | done | | V2 | complex | section 10, m#25 | mumcord-mobile · `.github/workflows/release.yml`, `RELEASING.md` |
+| 10.2 | Android: daily update check with notice and switch; opt-in crash reports; About screen with engine version and licences | done | | 10.1, 8.5 | complex | FR-5.101, FR-5.103, FR-5.100, m#25 | mumcord-mobile · `bridge/**`, `android/app` |
+| 10.3 | iOS release workflow: signed build on macOS runner, TestFlight upload, About screen | paused | | V2 | complex | FR-5.102, section 10, m#26 | mumcord-mobile · `.github/workflows/release.yml` (iOS job), `ios/**` |
+| 10.4 | End-to-end suite complete and running in CI on the Android emulator and the iOS simulator against the local test server with a bot | done (Android, inside `ci-android.yml` instead of a separate `e2e.yml`); iOS half paused | | V9 | complex | section 10, m#27 | mumcord-mobile · `e2e/**`, `.github/workflows/e2e.yml` |
+| 10.5 | Manual device checklist document per release, including battery and data measurements of section 9 | done | | V4 | simple | section 9, section 10, m#28 | mumcord-mobile · `docs/device-checklist.md` |
+| 10.6 | Roadmap and docs: roadmap table links the spec and marks Epic 5, README of both repositories | done | | 10.1, 10.3 | simple | section 14 | Mumcord · `specs/roadmap.md`, `README.md`; mumcord-mobile · `README.md` |
+| V10 | Verification: upgrade install keeps data, update notice, tagged test release produces APK with checksum and a TestFlight build, no secret in the repository | open (needs the release signing key, see `RELEASING.md` of the mobile repository) | | 10.2, 10.3, 10.4 | complex | AC-5.34, AC-5.35 | mumcord-mobile · report only |
+| D1 | Implementation report `specs/05-mobile-app-implementation.md` (report template of `/dev`), result per AC-5.1 … AC-5.38, open manual checks | done | | all V tasks | simple | all AC | Mumcord · `specs/05-mobile-app-implementation.md` |
 
 ## Follow-up: engine gaps found by the bridge work
 
-The engine and desktop part of this epic was merged into `milestone/0.9.0` with pull request #824 on 2026-11-14. The desktop "Send to your phone" dialog sits behind the build feature `phone-transfer`, which is off in release builds. The bridge work found these gaps in the engine, to be done in the Mumcord repository:
+The engine and desktop part of this epic was merged into `milestone/0.9.0` with pull request #824 on 2026-11-14. The desktop "Send to your phone" dialog was first behind the build feature `phone-transfer`; since milestone 0.10.0 it is in every build. The bridge work found these gaps in the engine, to be done in the Mumcord repository:
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|
-| E1 | Identity import and export from bytes (today only from and to a file path) | open | | | simple | FR-5.62, FR-5.63 | Mumcord · `crates/store`, `crates/engine` identity code |
-| E2 | Separate error kind for a wrong `.p12` password | open | | | simple | FR-5.62 | Mumcord · `crates/store`, `crates/engine` identity code |
-| E3 | Control-channel round-trip value for connections tunnelled over TCP; needs an accessor in the published `mumble-client-protocol` crate | open | | | complex | FR-5.2 | Mumcord · `crates/engine`; `mumble-client-protocol` |
-| E4 | Bridge: map the engine's local-network-blocked error | open | | | simple | FR-5.8 | mumcord-mobile · `bridge/**` |
+| E1 | Identity import and export from bytes (today only from and to a file path) | done in #913 | | | simple | FR-5.62, FR-5.63 | Mumcord · `crates/store`, `crates/engine` identity code |
+| E2 | Separate error kind for a wrong `.p12` password | done in #913 | | | simple | FR-5.62 | Mumcord · `crates/store`, `crates/engine` identity code |
+| E3 | Control-channel round-trip value for connections tunnelled over TCP; needs an accessor in the published `mumble-client-protocol` crate | deferred (decision D-5) | | | complex | FR-5.2 | Mumcord · `crates/engine`; `mumble-client-protocol` |
+| E4 | Bridge: map the engine's local-network-blocked error | open (engine error `LocalNetworkBlocked` landed in #913; the bridge mapping waits with iOS) | | | simple | FR-5.8 | mumcord-mobile · `bridge/**` |
+| E5 | Engine follow-ups for the apps: camera pause shown on the tile, choosing which camera tiles load and their path, phone camera availability, `UserRemoved` with actor, reason and ban flag, `comment_hash`, `set_own_avatar_bytes`, `reconnect_now`, crash recording of foreign crashes that keeps only the exception types | done in #913 | | | complex | FR-5.40, FR-5.75, FR-5.80, FR-5.94, FR-5.103 | Mumcord · `crates/engine`, `crates/camera` |
+| E6 | Themes as a Rust crate shared by desktop and the apps | deferred (decision D-5) | | | complex | FR-5.81 | Mumcord |
+| E7 | Portrait camera picture | deferred (decision D-5) | | | complex | FR-5.74 | Mumcord · `crates/engine` camera code |
+| E8 | Hook for a hardware video encoder (needed for the 540p30 camera cap) | deferred (decision D-5) | | | complex | FR-5.74 | Mumcord · `crates/screenshare`, `crates/engine` |
+| E9 | Keep the public server list across app starts | deferred (decision D-5) | | | simple | FR-5.9 | Mumcord · `crates/engine` |
+| E10 | Keep the activity log across connections | deferred (decision D-5) | | | simple | FR-5.94 | Mumcord · `crates/engine` |
+| E11 | SuperUser rights in subchannels | deferred (decision D-5) | | | simple | FR-5.90 … FR-5.93 | Mumcord · `crates/engine` |
+| E12 | Keep a whisper target across a reconnect | deferred (decision D-5) | | | simple | FR-5.24 | Mumcord · `crates/engine` |
+| E13 | Deep Ocean theme: contrast 4.40, the rule asks for 4.5 | open | | | simple | section 5 design | Mumcord · desktop theme tokens |
 
 ## Acceptance criteria coverage
 
@@ -283,3 +293,7 @@ Criteria that need a real phone (AC-5.8 for 30 minutes, AC-5.10 with a real call
 
 - The screens built without a mockup on Android (connect forms and sheets, permission sheets and banners, voice states, whisper bar, call notification, notices, chat states) were reviewed by the product manager and approved as built. Later tasks and the iOS counterparts keep that look.
 - Transfer code length: 8 digits, shown as 4 + 4 (replaces 6 digits).
+
+## Decisions after review (2026-11-15 … 2026-11-23)
+
+The product manager's decisions D-1 … D-8 of this period are recorded in section 12.1 of the specification. In short: no server-offered theme; iOS paused since 2026-11-15 with TestFlight; direct connections accepted with the desktop's setting and hint; engine follow-ups in #913 (E1, E2, E5); the engine items E3 and E6 … E12 deferred; APK of about 41 MB with uncompressed engine libraries (final call pending); 48 dp channel rows; mobile-only texts in English and German until the desktop translation pass.

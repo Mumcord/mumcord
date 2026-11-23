@@ -17,7 +17,11 @@
     "watchPartyStopped": "je ustavil skupno gledanje",
     "pluginActivityStarted": "je zagnal {{plugin}}",
     "pluginActivityStopped": "je ustavil {{plugin}}",
-    "pluginEvent": "»{{text}}«"
+    "pluginEvent": "»{{text}}«",
+    "kicked": "je bil(a) izločen(a)",
+    "banned": "je bil(a) izobčen(a)",
+    "kickedBy": "je bil(a) izločen(a) – {{name}}",
+    "bannedBy": "je bil(a) izobčen(a) – {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "vtičnik",

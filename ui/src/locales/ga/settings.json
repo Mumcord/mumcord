@@ -48,6 +48,7 @@
     "updates": "leagan nua uasghrádú",
     "storage": "spás diosca glan taisce",
     "blocked": "déan neamhaird bac bactha blocáil balbhaigh daoine",
+    "localMutes": "balbhaigh balbhú balbhuithe áitiúil dearmad tosú atosú",
     "notifications": "foláirimh preabfhuinneoga",
     "externalContent": "leabaithe íomhánna réamhamharcanna",
     "fileSharing": "comhaid seol faigh íoslódáil sábháil fillteán ceangaltán zip",
@@ -76,7 +77,8 @@
     "invalidInput": "Níor oibrigh sé sin: níl an comhad ná an pasfhocal bailí.",
     "duplicateIdentity": "Tá an t-aitheantas seo i do liosta cheana.",
     "notFound": "Níorbh fhéidir an comhad ná an mhír a aimsiú.",
-    "generic": "Chuaigh rud éigin amú. Bain triail eile as."
+    "generic": "Chuaigh rud éigin amú. Bain triail eile as.",
+    "wrongPassword": "Níl an focal faire ceart. Seiceáil é agus bain triail eile as."
   },
   "identity": {
     "export": "Easpórtáil…",
@@ -917,6 +919,11 @@
     "revokeLabel": "Cealaigh an comhrá glactha le {{name}}",
     "revokeFailed": "Theip ar an gcealú. Bain triail eile as."
   },
+  "localMutes": {
+    "title": "Balbhuithe áitiúla",
+    "switch": "Dearmad a dhéanamh ar na balbhuithe áitiúla nuair a thosaíonn Mumcord",
+    "hint": "Beidh daoine ar chuir tú balbhú orthu duit féin le cloisteáil arís tar éis atosú. Coinnítear na hairde agus na húsáideoirí blocáilte."
+  },
   "blocked": {
     "title": "Úsáideoirí bactha",
     "hint": "Coimeádtar bacanna ar an ríomhaire seo amháin. Tá úsáideoirí bactha balbhaithe duit agus déantar neamhaird dá dteachtaireachtaí agus dá sonraí Mumcord.",
@@ -968,7 +975,10 @@
     "channel": "Cainéal nuashonruithe",
     "channelHint": "Roghnaigh na heisiúintí a thairgeann Mumcord. Is éard atá in iarrthóirí eisiúna ná tógálacha luatha den chéad leagan eile.",
     "channels": {
-      "stable": { "name": "Cobhsaí", "hint": "Eisiúintí deiridh amháin" },
+      "stable": {
+        "name": "Cobhsaí",
+        "hint": "Eisiúintí deiridh amháin"
+      },
       "releaseCandidates": {
         "name": "Iarrthóirí eisiúna",
         "hint": "Tógálacha luatha den chéad leagan eile; d’fhéadfadh fabhtanna a bheith iontu"

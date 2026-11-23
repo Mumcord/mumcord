@@ -29,6 +29,7 @@ import { DuckingGroup } from "./sections/DuckingGroup";
 import { GamePluginsGroup } from "./sections/GamePluginsGroup";
 import { IdentitiesCard } from "./sections/IdentitySection";
 import { LanguageCard } from "./sections/LanguageSection";
+import { LocalMutesGroup } from "./sections/LocalMutesGroup";
 import { NowGamingGroup } from "./sections/NowGamingGroup";
 import { NowPlayingGroup } from "./sections/NowPlayingGroup";
 import { InGameOverlayCard } from "./sections/OverlaySection";
@@ -111,6 +112,7 @@ export function SettingsPageCards({
           <DndGroup />
           <PrivateMessagesGroup {...props} />
           <AcceptedConversationsGroup />
+          <LocalMutesGroup {...props} />
           <BlockedUsersGroup />
           <BlockedMessagesGroup {...props} />
           <MessageHistoryCard {...props} />

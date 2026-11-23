@@ -194,7 +194,13 @@ describe("activity log", () => {
       api.mock.emit("userUpserted", { serverId: SERVER, user: { ...bot, channelId: 2 } });
     });
     act(() => {
-      api.mock.emit("userRemoved", { serverId: SERVER, session: 77 });
+      api.mock.emit("userRemoved", {
+        serverId: SERVER,
+        session: 77,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(result.current.map((event) => event.kind)).toEqual(["connected"]);
   });
@@ -219,9 +225,49 @@ describe("activity log", () => {
     });
 
     act(() => {
-      api.mock.emit("userRemoved", { serverId: SERVER, session: NEWCOMER });
+      api.mock.emit("userRemoved", {
+        serverId: SERVER,
+        session: NEWCOMER,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     expect(result.current[0]).toMatchObject({ kind: "disconnected", name: "Nia", self: false });
+  });
+
+  it("names who kicked or banned a person (the standard UserRemove message)", async () => {
+    const { result } = renderHook(() => useActivityLog(SERVER));
+    await settle();
+    const anna = getServerStateOf(SERVER).users.get(ANNA)?.name ?? null;
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 1) });
+      api.mock.emit("userRemoved", {
+        serverId: SERVER,
+        session: NEWCOMER,
+        actor: ANNA,
+        reason: "spam",
+        ban: false,
+      });
+    });
+    expect(result.current[0]).toMatchObject({
+      kind: "disconnected",
+      name: "Nia",
+      removedBy: { name: anna, ban: false },
+    });
+    act(() => {
+      api.mock.emit("userRemoved", {
+        serverId: SERVER,
+        session: BEN,
+        actor: null,
+        reason: null,
+        ban: true,
+      });
+    });
+    expect(result.current[0]).toMatchObject({
+      kind: "disconnected",
+      removedBy: { name: null, ban: true },
+    });
   });
 
   it("keeps a blocked person in the history but marks the events so they never notify", async () => {
@@ -237,7 +283,13 @@ describe("activity log", () => {
       api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 1) });
       api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER, "Nia", 2) });
       api.mock.emit("userUpserted", { serverId: SERVER, user: person(NEWCOMER + 1, "Omar", 1) });
-      api.mock.emit("userRemoved", { serverId: SERVER, session: NEWCOMER });
+      api.mock.emit("userRemoved", {
+        serverId: SERVER,
+        session: NEWCOMER,
+        actor: null,
+        reason: null,
+        ban: false,
+      });
     });
     const log = result.current.filter(
       (event): event is Exclude<ActivityEvent, { kind: "pluginEvent" }> =>

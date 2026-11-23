@@ -33,6 +33,8 @@ pub enum Error {
     SecretUnavailable,
     #[error("PKCS#12 file could not be read (wrong password or unsupported file): {0}")]
     Pkcs12(#[from] p12_keystore::error::Error),
+    #[error("the password of the PKCS#12 file is wrong")]
+    Pkcs12WrongPassword,
     #[error("PKCS#12 file contains no private key with a matching certificate")]
     Pkcs12NoIdentity,
     #[error("the private key does not belong to the certificate")]

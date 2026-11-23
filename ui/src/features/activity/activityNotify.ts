@@ -57,10 +57,25 @@ export function switchOf(event: ActivityEvent): keyof ActivityNotifySettings | n
   }
 }
 
+/**
+ * How a person left: "disconnected", or kicked or banned and by whom when the server said so
+ * (the standard Mumble `UserRemove` message).
+ */
+export function leftVerb(
+  event: Extract<ActivityEvent, { kind: "disconnected" }>,
+  t: TFunction<"activity">,
+): string {
+  const removal = event.removedBy;
+  if (removal === undefined) return t("verb.disconnected");
+  if (removal.name === null) return t(removal.ban ? "verb.banned" : "verb.kicked");
+  return t(removal.ban ? "verb.bannedBy" : "verb.kickedBy", { name: removal.name });
+}
+
 function actionOf(event: ActivityEvent, t: TFunction<"activity">): string {
   switch (event.kind) {
-    case "connected":
     case "disconnected":
+      return leftVerb(event, t);
+    case "connected":
     case "moved":
       return t(`verb.${event.kind}`);
     case "screenShare":

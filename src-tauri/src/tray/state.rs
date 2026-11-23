@@ -225,7 +225,7 @@ impl TrayState {
                     return Change::None;
                 }
             }
-            EngineEvent::UserRemoved(session) => {
+            EngineEvent::UserRemoved { session, .. } => {
                 server.talking.remove(session);
                 server.users.remove(session);
             }
@@ -351,6 +351,7 @@ pub mod fixtures {
             has_avatar: false,
             avatar_hash: None,
             has_comment: false,
+            comment_hash: None,
             volume: 100,
             local_mute: false,
             share_volume: 100,
@@ -524,7 +525,16 @@ mod tests {
         assert_eq!(talk(&mut state, 1, 7, true), Change::Icon);
         assert_eq!(state.look(), Look::Talking);
         assert_eq!(talk(&mut state, 1, 1, true), Change::None);
-        state.apply(1, &EngineEvent::UserRemoved(7), String::new);
+        state.apply(
+            1,
+            &EngineEvent::UserRemoved {
+                session: 7,
+                actor: None,
+                reason: None,
+                ban: false,
+            },
+            String::new,
+        );
         talk(&mut state, 1, 1, false);
         assert_eq!(state.look(), Look::Idle);
     }

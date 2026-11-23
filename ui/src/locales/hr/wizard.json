@@ -79,7 +79,8 @@
     "importInvalid": "Datoteku nije bilo moguće otvoriti. Provjeri lozinku i je li to datoteka identiteta .p12 ili .pfx.",
     "importNotFound": "Datoteka nije pronađena. Odaberi je ponovno.",
     "importIo": "Datoteku nije bilo moguće pročitati. Odaberi je ponovno.",
-    "pickFailed": "Odabir datoteke nije bilo moguće otvoriti."
+    "pickFailed": "Odabir datoteke nije bilo moguće otvoriti.",
+    "importWrongPassword": "Lozinka nije točna. Provjerite je i pokušajte ponovno."
   },
   "mic": {
     "input": "Mikrofon",

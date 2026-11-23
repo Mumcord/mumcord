@@ -79,7 +79,8 @@
     "importInvalid": "Failu neizdevās atvērt. Pārbaudi paroli un to, vai tas ir .p12 vai .pfx identitātes fails.",
     "importNotFound": "Failu neizdevās atrast. Lūdzu, izvēlies to vēlreiz.",
     "importIo": "Failu neizdevās nolasīt. Lūdzu, izvēlies to vēlreiz.",
-    "pickFailed": "Failu izvēlni neizdevās atvērt."
+    "pickFailed": "Failu izvēlni neizdevās atvērt.",
+    "importWrongPassword": "Parole nav pareiza. Pārbaudiet to un mēģiniet vēlreiz."
   },
   "mic": {
     "input": "Mikrofons",

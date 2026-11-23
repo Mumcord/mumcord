@@ -4,9 +4,14 @@
 
 ### Added
 
+- The activity log and its notices say "{name} was kicked by {name}" or "was banned by {name}" when the server removes someone with a kick or ban, instead of a plain "disconnected"; who did it comes from the standard Mumble `UserRemove` message
+- A camera tile shows "{name} paused the camera" instead of a frozen last picture while the person's phone app is in the background (the coming Android and iOS apps pause their camera there); the pause travels as an extra field of the existing camera announcement, so older Mumcord versions keep showing the camera as before
 - Linux and FreeBSD package repository at https://packages.mumcord.app (issue #620): Debian, Ubuntu and Mint (APT), Fedora (DNF), openSUSE (zypper), Arch (pacman) and FreeBSD 15.x (`pkg`) can add it once and then get every new stable release through `apt upgrade`, `dnf upgrade`, `zypper update`, `pacman -Syu` or `pkg upgrade`. The repository metadata and the packages are signed with a dedicated Mumcord key (fingerprint `A4096249A499587C9AEF13E7F022C81D47D2BBEB`; FreeBSD uses its own `pkg` key), so a changed package or index is rejected. Steps and fingerprints are in `docs/package-repository.md`. The release workflow publishes each stable release there automatically after checking it on every supported system; opened in a browser, the address shows the install steps and the key fingerprint
 - The install script asks how to install Mumcord: from the package repository (the default where the system supports it), as a downloaded package, or as an AppImage; `--method repo|package|appimage` chooses without asking. `--uninstall` also removes the repository setup
 - When Mumcord was installed from the package repository, the update dialog shows the package manager command to update it (e.g. `sudo apt update && sudo apt install --only-upgrade mumcord`) instead of pointing to the release page
+- Settings → Chat & Notifications has a new "Local mutes" group with the switch "Forget local mutes when Mumcord starts". With it on, Mumcord clears every local mute you set, on all your servers, once each time it starts: people you muted only for yourself are audible again after a restart, while their volume, their screen-share sound volume, blocked users and friends stay as they are. It is off by default, so mutes keep surviving restarts as before; turning it on changes nothing until the next start, and reconnecting to a server never clears a mute (issue #872)
+
+- Settings → Account & Identity has a "Send to your phone…" button in every build, for the Mumcord Android app: it shows the identities you choose, and optionally your server list, as a loop of QR codes together with an 8-digit code to type on the phone, valid for 2 minutes. Nothing is sent over a network, and saved server passwords and channel access tokens are never included
 
 ### Changed
 
@@ -20,6 +25,7 @@
 
 ### Fixed
 
+- Importing an identity file with a wrong password says that the password is not correct, instead of the same message as for a file that holds no identity
 - The MUMCORD lettering at the top of the install script lines up again
 - Servers that publish their address as a DNS SRV record (`_mumble._tcp.<domain>`) can be joined by entering just the domain, like in the official Mumble client (issue #859): for an address without a port Mumcord looks up the record and connects to the host and port it names, in the order of its priority and weight, and moves on to the next one when a target cannot be reached. Without a record, or when the lookup fails, it connects to the address on port 64738 as before. An explicitly entered port other than 64738 skips the lookup. This applies to saved servers, `mumble://` links without a port, reconnects, "Test connection" and the online status in the server list; the trusted certificate stays tied to the saved server, so a changed certificate still asks
 - Scrollbars are no longer drawn on top of menus, popovers and dialogs (issue #875): every scrolling list and panel now has a slim scrollbar in the theme's colours, dark and light, that sits beside the content instead of floating over it, so it no longer covers row highlights or buttons at the right edge either. The scrollbar shows while you scroll or point at it and hides again a second after scrolling stops
@@ -35,6 +41,12 @@
 
 ### Internal
 
+- Engine: `identity_import_bytes` and `identity_export_bytes` import and export identities without a file (for the phone apps), and a server that iOS keeps from the local network is reported as "local network blocked", like on macOS
+- Crash reports: `crash::record_foreign` records an exception of the phone apps (kind "foreign exception", exception types only, never their messages, stack cut at 64 KiB); `crash::install` takes the app's private folders to shorten and ignores `HOME=/`; Android and iOS keep only the newest "unexpected exit" report; test builds (feature `test-backend`) can send uploads to a local loopback server through `MUMCORD_CRASH_UPLOAD_URL`, release builds always use the crash server
+- Engine: `reconnect_now` reconnects a server at once for an app that just got a working network again: it ends the wait before the next attempt, or drops a connection whose socket may be dead after a network change, and returns to the last channel with the own mute and deafen
+- Engine: `EngineEvent::UserRemoved` carries who kicked or banned the person, the reason and whether it was a ban; `UserView.comment_hash` changes whenever a person's comment changes; `set_own_avatar_bytes` sets the own avatar from image bytes without a file (for the phone apps)
+- Engine: `camera_set_tiles_wanted_by_default`, `camera_tile_set_wanted` and `camera_tile_path` for the phone apps, which load a camera only after the user taps it and show how it arrives; the desktop keeps loading every shown camera
+- Engine: a camera backend set by the embedding app counts as a camera backend, and Android and iOS builds count as platforms with a camera; before, any camera availability refresh (P2P mode, relay or direct-connections change) stopped a phone's camera as "not supported on this platform"
 - Native video-library build scripts honor explicit job limits (`CARGO_BUILD_JOBS` for libvpx and dav1d, `CMAKE_BUILD_PARALLEL_LEVEL` for SVT-AV1 and the hardware encoder SDK), allowing single-job builds on Raspberry Pi without changing other platforms' defaults; added regression checks and a Raspberry Pi build/test guide
 - FreeBSD packages could not be built into a relative output directory, and the package did not require the dynamically loaded `alsa-plugins` package that makes the OSS devices visible; both are fixed, with checks that run in CI. The native FreeBSD smoke and GPU-endurance tests are part of the CI job as well
 - Updated Rust dependencies and all checked-in Cargo lock files, among them Wry 0.57.2, `object` 0.41, `ort` 2.0.0-rc.15 and `windows-registry` 0.100; the bundled ONNX Runtime stays on 1.23.2, and audio thread priority, GTK, native dialogs, SQLite and the Windows bindings stay on the versions CPAL, Tauri and the live-test bot require

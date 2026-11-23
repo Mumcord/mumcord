@@ -79,7 +79,8 @@
     "importInvalid": "Faili ei õnnestunud avada. Kontrolli parooli ja seda, et see on .p12- või .pfx-identiteedifail.",
     "importNotFound": "Faili ei leitud. Palun vali see uuesti.",
     "importIo": "Faili ei õnnestunud lugeda. Palun vali see uuesti.",
-    "pickFailed": "Failivalijat ei õnnestunud avada."
+    "pickFailed": "Failivalijat ei õnnestunud avada.",
+    "importWrongPassword": "Parool ei ole õige. Kontrolli seda ja proovi uuesti."
   },
   "mic": {
     "input": "Mikrofon",

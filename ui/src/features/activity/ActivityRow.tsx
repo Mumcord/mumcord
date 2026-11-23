@@ -11,6 +11,7 @@ import type { TFunction } from "i18next";
 import { useT } from "../../i18n/useT";
 import { clickPerson, doubleClickPerson, ProfilePreviewTrigger } from "../members";
 import { ActivityIcon } from "./ActivityIcon";
+import { leftVerb } from "./activityNotify";
 import type { ActivityEvent } from "./activityStore";
 
 export interface ActivityRowProps {
@@ -75,7 +76,7 @@ function verb(event: ActivityEvent, t: TFunction): string {
     case "connected":
       return t("verb.connected");
     case "disconnected":
-      return t("verb.disconnected");
+      return leftVerb(event, t);
     case "moved":
       return t("verb.moved");
     case "screenShare":

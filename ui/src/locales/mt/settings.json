@@ -48,6 +48,7 @@
     "updates": "verżjoni ġdida upgrade",
     "storage": "spazju fid-disk imsaħ il-cache",
     "blocked": "injora blokka mute persuni",
+    "localMutes": "skiet silenzju skietta insa bidu",
     "notifications": "twissijiet pop-ups",
     "externalContent": "embeds immaġini previews",
     "fileSharing": "fajls ibgħat irċievi niżżel sejvja folder anness zip",
@@ -76,7 +77,8 @@
     "invalidInput": "Dan ma ħadimx: il-fajl jew il-password mhumiex validi.",
     "duplicateIdentity": "Din l-identità diġà fil-lista tiegħek.",
     "notFound": "Il-fajl jew l-element ma nstabx.",
-    "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+    "generic": "Xi ħaġa marret ħażin. Erġa' pprova.",
+    "wrongPassword": "Il-password mhix korretta. Iċċekkjaha u erġa' pprova."
   },
   "identity": {
     "export": "Esporta…",
@@ -917,6 +919,11 @@
     "revokeLabel": "Irrevoka l-konversazzjoni aċċettata ma' {{name}}",
     "revokeFailed": "L-irrevokar falla. Erġa' pprova."
   },
+  "localMutes": {
+    "title": "Silenzi lokali",
+    "switch": "Insa l-isilenzi lokali meta Mumcord jibda",
+    "hint": "Nies li skiettagħhom għalik biss jerġgħu jinstemgħu wara li jerġa’ jibda. Il-volumi u l-utenti mblukkati jinżammu."
+  },
   "blocked": {
     "title": "Utenti mblokkati",
     "hint": "Il-blokki jinżammu fuq dan il-kompjuter biss. L-utenti mblokkati huma msikkta għalik u l-messaġġi u d-dejta ta' Mumcord tagħhom jiġu injorati.",
@@ -968,7 +975,10 @@
     "channel": "Kanal tal-aġġornamenti",
     "channelHint": "Agħżel liema rilaxxi joffri Mumcord. Il-kandidati għar-rilaxx huma bnadi bikrin tal-verżjoni li jmiss.",
     "channels": {
-      "stable": { "name": "Stabbli", "hint": "Rilaxxi finali biss" },
+      "stable": {
+        "name": "Stabbli",
+        "hint": "Rilaxxi finali biss"
+      },
       "releaseCandidates": {
         "name": "Kandidati għar-rilaxx",
         "hint": "Bnadi bikrin tal-verżjoni li jmiss; jistgħu jinkludu bugs"

@@ -18,7 +18,7 @@ of the specs and what has shipped.
 | Epic 4.1 — File sharing, camera, screen-share upgrade, plugin platform 1.1 | `07-file-sharing-screenshare-*`, `08-camera-sharing-*`, `09-plugin-platform-1-1-*` | Released (0.7.0) |
 | Epic 4 — Admin features | `10-admin-moderation-*` | In progress (0.7.x → 0.8.0) |
 | Activity log | `11-activity-log-*` | Released (0.7.2) |
-| Epic 5 — Android and iOS | — | Later |
+| Epic 5 — Android and iOS | `05-mobile-app-*` | In progress: Android functionally complete (draft PR Mumcord/mumcord-mobile#29), iOS paused at about 55 % |
 | Epic 6 — Release and distribution (store listings) | — | Later |
 
 ## Spec index
@@ -36,6 +36,9 @@ of the specs and what has shipped.
 - `03-175-mumble-link-card-tasks.md` — the Mumble Link positional-audio card.
 - `04-mumpeer-relay-specification.md` — the optional Mumpeer relay for direct connections.
   With brainstorming. Lives in its own repository; Mumcord works fully without it.
+- `05-mobile-app-specification.md` — the Android and iOS apps: native Kotlin and Swift apps on
+  the shared Rust engine, in the repository Mumcord/mumcord-mobile. With brainstorming, tasks and
+  the implementation report (`05-mobile-app-implementation.md`).
 - `06-plugin-system-specification.md` — the WebAssembly plugin host, SDK, packages and registry.
   With brainstorming and tasks.
 - `07-file-sharing-screenshare-specification.md` — file sharing and the screen-share upgrade.
@@ -62,3 +65,9 @@ Version 0.7.2 is released. `milestone/0.8.0` carries the remaining Epic 4 admin 
 [Unreleased] section of `CHANGELOG.md` lists what has landed there so far. Features go to the
 milestone branch during a milestone and to `main` as fixes and patch releases — see `CLAUDE.md`
 under "Branches and releases".
+
+Epic 5 (mobile apps), as of 2026-11-23: the engine preparation shipped with 0.9.0 and its
+follow-ups (#913) are on `milestone/0.10.0`. The Android app is functionally complete and waits
+in the draft pull request Mumcord/mumcord-mobile#29 for its first signed release. iOS is paused
+since 2026-11-15 at about 55 % until Android is finished; the remaining scope is in
+`docs/ios-backlog.md` of the mobile repository. Details: `05-mobile-app-implementation.md`.

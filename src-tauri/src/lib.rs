@@ -656,13 +656,6 @@ pub fn run() {
                 ));
                 return true;
             }
-            if !commands::phone_transfer::command_allowed(call.message.command()) {
-                call.resolver.reject(commands::types::ApiError::new(
-                    commands::types::ErrorCode::NotImplemented,
-                    "Send to your phone is not available in this build",
-                ));
-                return true;
-            }
             invoke(call)
         })
         .manage(window::StartReveal::default())
@@ -1075,7 +1068,19 @@ fn emit_engine_event(
             user: user.into(),
         }
         .emit(app),
-        EngineEvent::UserRemoved(session) => people::UserRemoved { server_id, session }.emit(app),
+        EngineEvent::UserRemoved {
+            session,
+            actor,
+            reason,
+            ban,
+        } => people::UserRemoved {
+            server_id,
+            session,
+            actor,
+            reason,
+            ban,
+        }
+        .emit(app),
         EngineEvent::TalkStateChanged { session, talking } => people::TalkStateChanged {
             server_id,
             session,

@@ -52,7 +52,8 @@
     "externalContent": "manused pildid eelvaated",
     "fileSharing": "failid saada võta vastu laadi alla salvesta kaust manus zip",
     "screenSharing": "ekraani jagamine kvaliteet eraldusvõime fps kodek AV1 VP9 kodeerija graafikakaart",
-    "camera": "kaamera veebikaamera video taust hägustamine virtuaalne taust peegeldamine enda vaade"
+    "camera": "kaamera veebikaamera video taust hägustamine virtuaalne taust peegeldamine enda vaade",
+    "localMutes": "vaigista vaigistatud kohalik unusta käivitus"
   },
   "search": {
     "label": "Otsi seadeid",
@@ -70,7 +71,8 @@
     "invalidInput": "See ei õnnestunud: fail või parool pole kehtiv.",
     "duplicateIdentity": "See identiteet on juba sinu nimekirjas.",
     "notFound": "Faili või kirjet ei leitud.",
-    "generic": "Midagi läks valesti. Proovi palun uuesti."
+    "generic": "Midagi läks valesti. Proovi palun uuesti.",
+    "wrongPassword": "Parool ei ole õige. Kontrolli seda ja proovi uuesti."
   },
   "identity": {
     "export": "Ekspordi…",
@@ -899,6 +901,11 @@
     "revokeLabel": "Tühista vastuvõetud vestlus kasutajaga {{name}}",
     "revokeFailed": "Tühistamine ebaõnnestus. Proovi palun uuesti."
   },
+  "localMutes": {
+    "title": "Sinu jaoks vaigistatud",
+    "switch": "Unusta sinu jaoks vaigistatud inimesed Mumcordi käivitamisel",
+    "hint": "Inimesed, keda vaigistasid ainult enda jaoks, on pärast uuesti käivitamist jälle kuulda. Helitugevused ja blokeeritud kasutajad jäävad alles."
+  },
   "blocked": {
     "title": "Blokeeritud kasutajad",
     "hint": "Blokeeringuid hoitakse ainult selles arvutis. Blokeeritud kasutajad on sinu jaoks vaigistatud ning nende sõnumeid ja Mumcordi andmeid ignoreeritakse.",
@@ -950,7 +957,10 @@
     "channel": "Uuenduste kanal",
     "channelHint": "Vali, milliseid väljalaskeid Mumcord pakub. Väljalaskekandidaadid on järgmise versiooni varased järgud.",
     "channels": {
-      "stable": { "name": "Stabiilne", "hint": "Ainult lõplikud väljalasked" },
+      "stable": {
+        "name": "Stabiilne",
+        "hint": "Ainult lõplikud väljalasked"
+      },
       "releaseCandidates": {
         "name": "Väljalaskekandidaadid",
         "hint": "Järgmise versiooni varased järgud; võivad sisaldada vigu"
