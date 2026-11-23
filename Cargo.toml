@@ -171,7 +171,7 @@ objc2-av-foundation = { version = "0.3", default-features = false, features = ["
 # Plugins (Epic 3.1, #268): WebAssembly components run in wasmtime without WASI, so a plugin can
 # only call what Mumcord defines. Only the runtime, the Cranelift compiler and the component model:
 # no async, GC, threads, profiling, cache or pooling allocator (smaller binary, less attack surface).
-wasmtime = { version = "50", default-features = false, features = ["runtime", "cranelift", "component-model", "std"] }
+wasmtime = { version = "51", default-features = false, features = ["runtime", "cranelift", "component-model", "std"] }
 # Plugin packages (#269): `.mcplugin` zips, stored or deflate only.
 zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 # Mark downloaded files with the OS "from the internet" flag on macOS and Linux (spec 07, FR-7.24).
