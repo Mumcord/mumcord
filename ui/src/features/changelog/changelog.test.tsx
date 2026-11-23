@@ -349,7 +349,6 @@ describe("WhatsNewOnStart", () => {
       packageVersion: "0.4.4",
       os: "mock",
       appimage: false,
-      phoneTransfer: false,
       portable: false,
       distro: null,
       limits: [],
