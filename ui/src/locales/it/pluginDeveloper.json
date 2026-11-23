@@ -8,8 +8,8 @@
   "status": {
     "running": "In esecuzione",
     "off": "Disattivato",
-    "backingOff": "Riavvio dopo un arresto anomalo",
-    "autoOff": "Disattivato dopo arresti anomali ripetuti",
+    "backingOff": "Riavvio dopo un crash",
+    "autoOff": "Disattivato dopo crash ripetuti",
     "allOff": "Tutti i plugin sono disattivati",
     "noPlugins": "I plugin sono disattivati per questa sessione",
     "notLoaded": "Caricamento non riuscito"

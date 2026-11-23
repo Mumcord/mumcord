@@ -2,7 +2,7 @@
   "type": "Plugin",
   "autoOff": {
     "title": "{{name}} è stato disattivato",
-    "body": "Disattivato dopo arresti anomali ripetuti",
+    "body": "Disattivato dopo crash ripetuti",
     "open": "Mostra in Plugin"
   },
   "pictureRefused": {

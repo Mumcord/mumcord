@@ -82,7 +82,7 @@
     "trustIf": "Fidati se",
     "trustIfText": "gli amministratori del server hanno annunciato un nuovo relay o un trasferimento e puoi confermarlo con loro.",
     "dontTrustIf": "Non fidarti se",
-    "dontTrustIfText": "nessuno ha annunciato un cambiamento o non sei sicuro. Qualcuno potrebbe fingersi il relay.",
+    "dontTrustIfText": "nessuno ha annunciato un cambiamento, o non ne hai la certezza. Qualcuno potrebbe fingersi il relay.",
     "notNow": "Non ora",
     "review": "Relay cambiato – verifica",
     "filesBlocked": "La condivisione file non è disponibile: il relay di questo server è cambiato e non è ancora attendibile."
