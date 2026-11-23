@@ -8346,7 +8346,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (715 crates)
+* MIT License (706 crates)
 * Apache License 2.0 (45 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (20 crates)
@@ -8575,19 +8575,19 @@ Apache License 2.0
 --------------------------------------------------------------------------------
 
 Used by:
-  - cranelift-bforest 0.137.2 (https://github.com/bytecodealliance/wasmtime)
-  - cranelift-codegen-shared 0.137.2 (https://github.com/bytecodealliance/wasmtime)
-  - cranelift-codegen 0.137.2 (https://github.com/bytecodealliance/wasmtime)
-  - cranelift-control 0.137.2 (https://github.com/bytecodealliance/wasmtime)
-  - cranelift-entity 0.137.2 (https://github.com/bytecodealliance/wasmtime)
-  - cranelift-frontend 0.137.2 (https://github.com/bytecodealliance/wasmtime)
-  - cranelift-native 0.137.2 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-bforest 0.138.0 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-codegen-shared 0.138.0 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-codegen 0.138.0 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-control 0.138.0 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-entity 0.138.0 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-frontend 0.138.0 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-native 0.138.0 (https://github.com/bytecodealliance/wasmtime)
   - regalloc2 0.15.2 (https://github.com/bytecodealliance/regalloc2)
   - target-lexicon 0.13.6 (https://github.com/bytecodealliance/target-lexicon)
-  - wasmtime-environ 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime-internal-cranelift 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime-internal-unwinder 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime 50.0.2 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-environ 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-cranelift 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-unwinder 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime 51.0.0 (https://github.com/bytecodealliance/wasmtime)
 
 
                                  Apache License
@@ -10155,21 +10155,21 @@ Used by:
   - ab_glyph_rasterizer 0.1.10 (https://github.com/alexheretic/ab-glyph)
   - audio-codec-algorithms 0.8.1 (https://github.com/karip/audio-codec-algorithms)
   - constant_time_eq 0.6.1 (https://codeberg.org/cesarb/constant_time_eq)
-  - cranelift-assembler-x64 0.137.2
-  - cranelift-bitset 0.137.2 (https://github.com/bytecodealliance/wasmtime)
+  - cranelift-assembler-x64 0.138.0
+  - cranelift-bitset 0.138.0 (https://github.com/bytecodealliance/wasmtime)
   - dunce 1.0.5 (https://gitlab.com/kornelski/dunce)
   - owned_ttf_parser 0.25.1 (https://github.com/alexheretic/owned-ttf-parser)
-  - pulley-interpreter 50.0.2 (https://github.com/bytecodealliance/wasmtime/tree/main/pulley)
-  - pulley-macros 50.0.2 (https://github.com/bytecodealliance/wasmtime/tree/main/pulley/macros)
+  - pulley-interpreter 51.0.0 (https://github.com/bytecodealliance/wasmtime/tree/main/pulley)
+  - pulley-macros 51.0.0 (https://github.com/bytecodealliance/wasmtime/tree/main/pulley/macros)
   - rpassword 7.5.5 (https://github.com/conradkleinespel/rpassword)
   - rtoolbox 0.0.6 (https://github.com/conradkleinespel/rtoolbox)
   - sync_wrapper 1.0.2 (https://github.com/Actyx/sync_wrapper)
-  - wasmtime-internal-component-macro 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime-internal-component-util 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime-internal-core 50.0.2
-  - wasmtime-internal-jit-icache-coherence 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime-internal-versioned-export-macros 50.0.2 (https://github.com/bytecodealliance/wasmtime)
-  - wasmtime-internal-wit-bindgen 50.0.2 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-component-macro 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-component-util 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-core 51.0.0
+  - wasmtime-internal-jit-icache-coherence 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-versioned-export-macros 51.0.0 (https://github.com/bytecodealliance/wasmtime)
+  - wasmtime-internal-wit-bindgen 51.0.0 (https://github.com/bytecodealliance/wasmtime)
 
 Apache License
 Version 2.0, January 2004
@@ -19933,18 +19933,14 @@ Used by:
   - windows-result 0.4.1 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.100.0 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.5.1 (https://github.com/microsoft/windows-rs)
-  - windows-sys 0.45.0 (https://github.com/microsoft/windows-rs)
-  - windows-sys 0.52.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.59.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.61.2 (https://github.com/microsoft/windows-rs)
-  - windows-targets 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows-targets 0.52.6 (https://github.com/microsoft/windows-rs)
   - windows-threading 0.100.0 (https://github.com/microsoft/windows-rs)
   - windows-threading 0.2.1 (https://github.com/microsoft/windows-rs)
   - windows-version 0.1.7 (https://github.com/microsoft/windows-rs)
   - windows 0.62.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_gnu 0.52.6 (https://github.com/microsoft/windows-rs)
-  - windows_x86_64_msvc 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_msvc 0.52.6 (https://github.com/microsoft/windows-rs)
 
 MIT License
@@ -20348,24 +20344,19 @@ Used by:
   - typed-path 0.13.0 (https://github.com/chipsenkbeil/typed-path)
   - typeid 1.0.3 (https://github.com/dtolnay/typeid)
   - unicode-ident 1.0.27 (https://github.com/dtolnay/unicode-ident)
-  - wasm-encoder 0.261.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder)
   - wasm-encoder 0.262.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder)
   - wasm-encoder 0.263.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-encoder)
-  - wasm-metadata 0.261.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-metadata)
   - wasm-metadata 0.262.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-metadata)
   - wasm-metadata 0.263.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-metadata)
-  - wasmparser 0.261.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser)
   - wasmparser 0.262.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser)
   - wasmparser 0.263.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmparser)
-  - wasmprinter 0.261.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmprinter)
+  - wasmprinter 0.263.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmprinter)
   - wit-bindgen-core 0.63.0 (https://github.com/bytecodealliance/wit-bindgen)
   - wit-bindgen-rust-macro 0.63.0 (https://github.com/bytecodealliance/wit-bindgen)
   - wit-bindgen-rust 0.63.0 (https://github.com/bytecodealliance/wit-bindgen)
   - wit-bindgen 0.63.0 (https://github.com/bytecodealliance/wit-bindgen)
-  - wit-component 0.261.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-component)
   - wit-component 0.262.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-component)
   - wit-component 0.263.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-component)
-  - wit-parser 0.261.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-parser)
   - wit-parser 0.262.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-parser)
   - wit-parser 0.263.0 (https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wit-parser)
   - x11-dl 2.21.0 (https://github.com/AltF02/x11-rs.git)
