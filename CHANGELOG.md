@@ -28,6 +28,8 @@
 
 - Noise suppression (RNNoise) rejects a damaged or manipulated noise model when it loads instead of crashing later during a call, and its processor-specific fast paths check sizes themselves instead of relying on the loader
 
+- `url` 2.5.8 → 2.5.9, the patch release for RUSTSEC-2026-0592: `Url::origin()` could overflow the stack on a deeply nested `blob:` URL. Mumcord itself never asks a URL for its origin, but the crate parses links from untrusted sources (for example in the chat sanitizer), so the fixed version is taken anyway; nothing else changes
+
 ### Internal
 
 - Native video-library build scripts honor explicit job limits (`CARGO_BUILD_JOBS` for libvpx and dav1d, `CMAKE_BUILD_PARALLEL_LEVEL` for SVT-AV1 and the hardware encoder SDK), allowing single-job builds on Raspberry Pi without changing other platforms' defaults; added regression checks and a Raspberry Pi build/test guide
