@@ -11,6 +11,8 @@
 - When Mumcord was installed from the package repository, the update dialog shows the package manager command to update it (e.g. `sudo apt update && sudo apt install --only-upgrade mumcord`) instead of pointing to the release page
 - Settings → Chat & Notifications has a new "Local mutes" group with the switch "Forget local mutes when Mumcord starts". With it on, Mumcord clears every local mute you set, on all your servers, once each time it starts: people you muted only for yourself are audible again after a restart, while their volume, their screen-share sound volume, blocked users and friends stay as they are. It is off by default, so mutes keep surviving restarts as before; turning it on changes nothing until the next start, and reconnecting to a server never clears a mute (issue #872)
 
+- Settings → Account & Identity has a "Send to your phone…" button in every build, for the Mumcord Android app: it shows the identities you choose, and optionally your server list, as a loop of QR codes together with an 8-digit code to type on the phone, valid for 2 minutes. Nothing is sent over a network, and saved server passwords and channel access tokens are never included
+
 ### Changed
 
 - The camera background effects (blur and background images) now come from the open-source `bgmatte` crate, which the Mumcord team maintains in its own repository (issue #454). The segmentation models ship inside that crate, so building Mumcord no longer downloads them; ONNX Runtime is still fetched and shipped with Mumcord as before. Nothing changes in how the effects look or behave

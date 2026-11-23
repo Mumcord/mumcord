@@ -29,7 +29,6 @@ function onSystem(os: string, distro: LinuxDistro | null, appimage = false) {
     packageVersion: "0.4.0",
     os,
     appimage,
-    phoneTransfer: false,
     portable: false,
     limits: [],
     session: null,

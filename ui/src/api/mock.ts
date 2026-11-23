@@ -4052,7 +4052,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               distro: null,
               limits: [],
               session: null,
-              phoneTransfer: true,
             }
           : {
               version: "0.0.0-mock",
@@ -4063,7 +4062,6 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               distro: null,
               limits: [],
               session: null,
-              phoneTransfer: true,
             },
       ),
 

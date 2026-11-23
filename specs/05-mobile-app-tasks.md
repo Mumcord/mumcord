@@ -238,7 +238,7 @@ Can start in parallel right now: **1.1, 1.2, 1.3, 1.4** (four different crates, 
 
 ## Follow-up: engine gaps found by the bridge work
 
-The engine and desktop part of this epic was merged into `milestone/0.9.0` with pull request #824 on 2026-11-14. The desktop "Send to your phone" dialog sits behind the build feature `phone-transfer`, which is off in release builds. The bridge work found these gaps in the engine, to be done in the Mumcord repository:
+The engine and desktop part of this epic was merged into `milestone/0.9.0` with pull request #824 on 2026-11-14. The desktop "Send to your phone" dialog was first behind the build feature `phone-transfer`; since milestone 0.10.0 it is in every build. The bridge work found these gaps in the engine, to be done in the Mumcord repository:
 
 | ID | Title | Status | Owner | Depends on | Complexity | Covers | Repo · owned files/areas |
 |---|---|---|---|---|---|---|---|

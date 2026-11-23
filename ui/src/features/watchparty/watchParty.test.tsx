@@ -436,7 +436,6 @@ describe("panel", () => {
         packageVersion: "0.8.0",
         os: "freebsd x86_64",
         appimage: false,
-        phoneTransfer: false,
         portable: false,
         limits: [],
         session: null,
