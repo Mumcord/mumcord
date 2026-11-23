@@ -17,7 +17,11 @@
     "watchPartyStopped": "ολοκλήρωσε την κοινή προβολή",
     "pluginActivityStarted": "ξεκίνησε το {{plugin}}",
     "pluginActivityStopped": "σταμάτησε το {{plugin}}",
-    "pluginEvent": "«{{text}}»"
+    "pluginEvent": "«{{text}}»",
+    "kicked": "αποβλήθηκε",
+    "banned": "αποκλείστηκε",
+    "kickedBy": "αποβλήθηκε από τον/την {{name}}",
+    "bannedBy": "αποκλείστηκε από τον/την {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "πρόσθετο",

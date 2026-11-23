@@ -204,7 +204,9 @@
     "viewing": "Oglądasz",
     "weak": "Słabe połączenie",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Ta kamera wymaga Mumcord 0.9.0"
+    "needsUpdate": "Ta kamera wymaga Mumcord 0.9.0",
+    "paused": "{{name}} wstrzymał(a) kamerę",
+    "pausedLabel": ", kamera wstrzymana"
   },
   "tileMenu": {
     "options": "Opcje dla {{name}}",

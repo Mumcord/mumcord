@@ -197,7 +197,9 @@
     "viewing": "In visione",
     "weak": "Connessione debole",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Questa fotocamera richiede Mumcord 0.9.0"
+    "needsUpdate": "Questa fotocamera richiede Mumcord 0.9.0",
+    "paused": "{{name}} ha messo in pausa la videocamera",
+    "pausedLabel": ", videocamera in pausa"
   },
   "tileMenu": {
     "options": "Opzioni per {{name}}",

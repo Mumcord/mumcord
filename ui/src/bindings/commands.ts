@@ -2050,6 +2050,11 @@ export type CameraTile = {
 	dataSaver: boolean,
 	/**  The "{n} fps" badge with "Weak connection" (FR-8.58); `null` hides it. */
 	fpsBadge: number | null,
+	/**
+	 *  The person's app paused the camera (it went to the background); no frames come until it
+	 *  resumes.
+	 */
+	paused: boolean,
 };
 
 /**  "Quality for me" of one tile (FR-8.56). */
@@ -5821,6 +5826,12 @@ export type UserName = {
 export type UserRemoved = {
 	serverId: number,
 	session: number,
+	/**  Who kicked or banned the person; `null` when they left on their own. */
+	actor: number | null,
+	/**  The reason the kicker gave; untrusted plain text from the server. */
+	reason: string | null,
+	/**  A ban rather than a kick. */
+	ban: boolean,
 };
 
 /**

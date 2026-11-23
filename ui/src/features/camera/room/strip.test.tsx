@@ -37,6 +37,7 @@ function tile(sharer: number): CameraTile {
     quality: "auto",
     dataSaver: false,
     fpsBadge: null,
+    paused: false,
   };
 }
 

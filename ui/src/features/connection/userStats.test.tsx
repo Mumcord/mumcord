@@ -178,6 +178,9 @@ describe("profile card figures", () => {
       api.mock.emit("userRemoved", {
         serverId: 1,
         session: ANNA,
+        actor: null,
+        reason: null,
+        ban: false,
       });
     });
     expect(screen.queryByLabelText("Connection")).toBeNull();

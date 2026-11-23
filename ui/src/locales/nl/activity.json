@@ -17,7 +17,11 @@
     "watchPartyStopped": "stopte de watchparty",
     "pluginActivityStarted": "startte {{plugin}}",
     "pluginActivityStopped": "stopte {{plugin}}",
-    "pluginEvent": "“{{text}}”"
+    "pluginEvent": "“{{text}}”",
+    "kicked": "is verwijderd",
+    "banned": "is verbannen",
+    "kickedBy": "is verwijderd door {{name}}",
+    "bannedBy": "is verbannen door {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "plug-in",

@@ -17,7 +17,11 @@
     "watchPartyStopped": "afsluttede fællesvisningen",
     "pluginActivityStarted": "startede {{plugin}}",
     "pluginActivityStopped": "stoppede {{plugin}}",
-    "pluginEvent": "»{{text}}«"
+    "pluginEvent": "»{{text}}«",
+    "kicked": "blev smidt ud",
+    "banned": "blev udelukket",
+    "kickedBy": "blev smidt ud af {{name}}",
+    "bannedBy": "blev udelukket af {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",

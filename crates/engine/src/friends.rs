@@ -191,7 +191,7 @@ impl Tracker {
             {
                 self.upsert(server_id, user, now, &mut seen);
             }
-            (EngineEvent::UserRemoved(session), Some(server_id)) => {
+            (EngineEvent::UserRemoved { session, .. }, Some(server_id)) => {
                 self.leave((server_id, *session), now, &mut seen);
             }
             (EngineEvent::StateChanged(state), Some(server_id))
@@ -317,6 +317,7 @@ mod tests {
             has_avatar: false,
             avatar_hash: None,
             has_comment: false,
+            comment_hash: None,
             volume: 100,
             local_mute: false,
             share_volume: 100,
@@ -416,7 +417,16 @@ mod tests {
         );
         assert!(list.is_none());
 
-        let (seen, list) = t.observe(Some(7), &EngineEvent::UserRemoved(2), 20);
+        let (seen, list) = t.observe(
+            Some(7),
+            &EngineEvent::UserRemoved {
+                session: 2,
+                actor: None,
+                reason: None,
+                ban: false,
+            },
+            20,
+        );
         assert_eq!(seen, [("bot".into(), "Bot".into(), 20)]);
         let list = list.expect("offline");
         let bot = list.iter().find(|v| v.cert_hash == "bot").expect("bot");
@@ -499,7 +509,16 @@ mod tests {
                 channel_id: 4
             })
         );
-        let (_, list) = t.observe(Some(7), &EngineEvent::UserRemoved(2), 12);
+        let (_, list) = t.observe(
+            Some(7),
+            &EngineEvent::UserRemoved {
+                session: 2,
+                actor: None,
+                reason: None,
+                ban: false,
+            },
+            12,
+        );
         assert!(list.is_none(), "leaving server 7 does not touch server 8");
 
         // Server 7 ending keeps the friend online on server 8.

@@ -75,7 +75,8 @@
     "invalidInput": "Nepavyko: failas arba slaptažodis netinkamas.",
     "duplicateIdentity": "Ši tapatybė jau yra tavo sąraše.",
     "notFound": "Failo ar elemento nepavyko rasti.",
-    "generic": "Kažkas nepavyko. Bandyk dar kartą."
+    "generic": "Kažkas nepavyko. Bandyk dar kartą.",
+    "wrongPassword": "Slaptažodis neteisingas. Patikrinkite jį ir bandykite dar kartą."
   },
   "identity": {
     "export": "Eksportuoti…",
@@ -968,7 +969,10 @@
     "channel": "Naujinių kanalas",
     "channelHint": "Pasirink, kokias versijas siūlo Mumcord. Išleidimo kandidatai yra ankstyvos kitos versijos darinys.",
     "channels": {
-      "stable": { "name": "Stabili", "hint": "Tik galutinės versijos" },
+      "stable": {
+        "name": "Stabili",
+        "hint": "Tik galutinės versijos"
+      },
       "releaseCandidates": {
         "name": "Išleidimo kandidatai",
         "hint": "Ankstyvos kitos versijos darinys; gali būti klaidų"

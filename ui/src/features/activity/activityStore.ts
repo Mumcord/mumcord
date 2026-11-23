@@ -21,6 +21,7 @@ import {
   getServerStateOf,
   getVoiceServerId,
   subscribeAllServerChanges,
+  type Removal,
   type ServerChange,
   type ServerState,
 } from "../channels/serverStore";
@@ -89,7 +90,13 @@ interface PersonBase {
  * session so the text is localized as "You …" (T6).
  */
 export type ActivityEvent =
-  | (EventBase & PersonBase & { kind: "connected" | "disconnected" })
+  | (EventBase & PersonBase & { kind: "connected" })
+  | (EventBase &
+      PersonBase & {
+        kind: "disconnected";
+        /** Kicked or banned, and by whom (the standard `UserRemove` message). */
+        removedBy?: Removal;
+      })
   | (EventBase & PersonBase & { kind: "moved"; channelName: string | null })
   | (EventBase &
       PersonBase & {
@@ -479,6 +486,7 @@ function onServerChange(serverId: number, change: ServerChange, state: ServerSta
         session: change.user.session,
         name: change.user.name,
         self: isSelf(state, change.user.session),
+        ...(change.removedBy === null ? {} : { removedBy: change.removedBy }),
         ...blockedMark(serverId, change.user),
       });
       break;

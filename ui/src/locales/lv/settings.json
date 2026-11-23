@@ -73,7 +73,8 @@
     "invalidInput": "Tas neizdevās: fails vai parole nav derīga.",
     "duplicateIdentity": "Šī identitāte jau ir sarakstā.",
     "notFound": "Failu vai vienumu neizdevās atrast.",
-    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
+    "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz.",
+    "wrongPassword": "Parole nav pareiza. Pārbaudiet to un mēģiniet vēlreiz."
   },
   "identity": {
     "export": "Eksportēt…",
@@ -962,7 +963,10 @@
     "channel": "Atjauninājumu kanāls",
     "channelHint": "Izvēlies, kuras versijas Mumcord piedāvā. Izlaides kandidāti ir nākamās versijas agrīnie būvējumi.",
     "channels": {
-      "stable": { "name": "Stabilā", "hint": "Tikai galīgās versijas" },
+      "stable": {
+        "name": "Stabilā",
+        "hint": "Tikai galīgās versijas"
+      },
       "releaseCandidates": {
         "name": "Izlaides kandidāti",
         "hint": "Nākamās versijas agrīnie būvējumi; var saturēt kļūdas"

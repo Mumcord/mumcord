@@ -73,7 +73,8 @@
     "invalidInput": "To nije uspjelo: datoteka ili lozinka nisu ispravne.",
     "duplicateIdentity": "Ovaj identitet je već u tvom popisu.",
     "notFound": "Datoteka ili stavka nije pronađena.",
-    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+    "generic": "Nešto je pošlo po zlu. Pokušaj ponovno.",
+    "wrongPassword": "Lozinka nije točna. Provjerite je i pokušajte ponovno."
   },
   "identity": {
     "export": "Izvezi…",
@@ -962,7 +963,10 @@
     "channel": "Kanal ažuriranja",
     "channelHint": "Odaberi koja izdanja Mumcord nudi. Kandidati za izdanje rane su verzije sljedeće verzije.",
     "channels": {
-      "stable": { "name": "Stabilna", "hint": "Samo završna izdanja" },
+      "stable": {
+        "name": "Stabilna",
+        "hint": "Samo završna izdanja"
+      },
       "releaseCandidates": {
         "name": "Kandidati za izdanje",
         "hint": "Rane verzije sljedeće verzije; mogu sadržavati greške"

@@ -211,7 +211,9 @@
     "viewing": "Ag féachaint",
     "weak": "Nasc lag",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Teastaíonn Mumcord 0.9.0 ón gceamara seo"
+    "needsUpdate": "Teastaíonn Mumcord 0.9.0 ón gceamara seo",
+    "paused": "Chuir {{name}} an ceamara ar sos",
+    "pausedLabel": ", ceamara ar sos"
   },
   "tileMenu": {
     "options": "Roghanna do {{name}}",

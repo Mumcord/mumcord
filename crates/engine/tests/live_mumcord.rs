@@ -162,7 +162,7 @@ async fn mumcord_clients_see_each_other_but_not_official_ones() {
     // A reconnect of B (new session) is recognised again.
     b.disconnect(only_server(&b));
     wait_for(&mut a_rx, "B leaving", |e| match e {
-        EngineEvent::UserRemoved(_) => Some(()),
+        EngineEvent::UserRemoved { .. } => Some(()),
         _ => None,
     })
     .await;

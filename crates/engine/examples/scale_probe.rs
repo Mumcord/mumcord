@@ -15,7 +15,7 @@ use mumcord_engine::{Engine, EngineEvent, PasswordChange, SecretStore, ServerFie
 fn kind(event: &EngineEvent) -> &'static str {
     match event {
         EngineEvent::UserUpserted(_) => "userUpserted",
-        EngineEvent::UserRemoved(_) => "userRemoved",
+        EngineEvent::UserRemoved { .. } => "userRemoved",
         EngineEvent::TalkStateChanged { .. } => "talk",
         EngineEvent::MessageReceived(_) => "message",
         EngineEvent::ChannelUpserted(_)

@@ -71,7 +71,8 @@
     "invalidInput": "Ez nem sikerült: a fájl vagy a jelszó érvénytelen.",
     "duplicateIdentity": "Ez az identitás már szerepel a listádban.",
     "notFound": "A fájl vagy elem nem található.",
-    "generic": "Valami hiba történt. Próbáld újra."
+    "generic": "Valami hiba történt. Próbáld újra.",
+    "wrongPassword": "A jelszó nem megfelelő. Ellenőrizd, és próbáld újra."
   },
   "identity": {
     "export": "Exportálás…",
@@ -956,7 +957,10 @@
     "channel": "Frissítési csatorna",
     "channelHint": "Válaszd ki, mely kiadásokat kínálja fel a Mumcord. A kiadásra jelölt verziók a következő verzió korai változatai.",
     "channels": {
-      "stable": { "name": "Stabil", "hint": "Csak végleges kiadások" },
+      "stable": {
+        "name": "Stabil",
+        "hint": "Csak végleges kiadások"
+      },
       "releaseCandidates": {
         "name": "Kiadásra jelölt verziók",
         "hint": "A következő verzió korai változatai; hibákat tartalmazhatnak"

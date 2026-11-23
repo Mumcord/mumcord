@@ -77,7 +77,8 @@
     "invalidInput": "Dan ma ħadimx: il-fajl jew il-password mhumiex validi.",
     "duplicateIdentity": "Din l-identità diġà fil-lista tiegħek.",
     "notFound": "Il-fajl jew l-element ma nstabx.",
-    "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
+    "generic": "Xi ħaġa marret ħażin. Erġa' pprova.",
+    "wrongPassword": "Il-password mhix korretta. Iċċekkjaha u erġa' pprova."
   },
   "identity": {
     "export": "Esporta…",
@@ -974,7 +975,10 @@
     "channel": "Kanal tal-aġġornamenti",
     "channelHint": "Agħżel liema rilaxxi joffri Mumcord. Il-kandidati għar-rilaxx huma bnadi bikrin tal-verżjoni li jmiss.",
     "channels": {
-      "stable": { "name": "Stabbli", "hint": "Rilaxxi finali biss" },
+      "stable": {
+        "name": "Stabbli",
+        "hint": "Rilaxxi finali biss"
+      },
       "releaseCandidates": {
         "name": "Kandidati għar-rilaxx",
         "hint": "Bnadi bikrin tal-verżjoni li jmiss; jistgħu jinkludu bugs"

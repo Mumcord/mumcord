@@ -197,7 +197,9 @@
     "viewing": "Vizionezi",
     "weak": "Conexiune slabă",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Această cameră necesită Mumcord 0.9.0"
+    "needsUpdate": "Această cameră necesită Mumcord 0.9.0",
+    "paused": "{{name}} a pus camera pe pauză",
+    "pausedLabel": ", camera pe pauză"
   },
   "tileMenu": {
     "options": "Opțiuni pentru {{name}}",

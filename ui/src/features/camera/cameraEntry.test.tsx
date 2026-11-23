@@ -260,6 +260,7 @@ describe("channel-tree camera marker", () => {
       quality: "auto" as const,
       dataSaver: false,
       fpsBadge: null,
+      paused: false,
     };
     act(() => {
       api.mock.emit("cameraRoomChanged", {

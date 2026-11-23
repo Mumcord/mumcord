@@ -190,7 +190,9 @@
     "viewing": "Ser med",
     "weak": "Svag forbindelse",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Dette kamera kræver Mumcord 0.9.0"
+    "needsUpdate": "Dette kamera kræver Mumcord 0.9.0",
+    "paused": "{{name}} har sat kameraet på pause",
+    "pausedLabel": ", kamera på pause"
   },
   "tileMenu": {
     "options": "Indstillinger for {{name}}",

@@ -79,7 +79,8 @@
     "importInvalid": "Níorbh fhéidir an comhad a oscailt. Seiceáil an pasfhocal agus gur comhad aitheantais .p12 nó .pfx é.",
     "importNotFound": "Níorbh fhéidir an comhad a aimsiú. Roghnaigh arís é.",
     "importIo": "Níorbh fhéidir an comhad a léamh. Roghnaigh arís é.",
-    "pickFailed": "Níorbh fhéidir an roghnóir comhad a oscailt."
+    "pickFailed": "Níorbh fhéidir an roghnóir comhad a oscailt.",
+    "importWrongPassword": "Níl an focal faire ceart. Seiceáil é agus bain triail eile as."
   },
   "mic": {
     "input": "Micreafón",

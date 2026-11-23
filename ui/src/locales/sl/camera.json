@@ -204,7 +204,9 @@
     "viewing": "Gledaš",
     "weak": "Šibka povezava",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Ta kamera potrebuje Mumcord 0.9.0"
+    "needsUpdate": "Ta kamera potrebuje Mumcord 0.9.0",
+    "paused": "{{name}} je začasno ustavil(a) kamero",
+    "pausedLabel": ", kamera začasno ustavljena"
   },
   "tileMenu": {
     "options": "Možnosti za {{name}}",

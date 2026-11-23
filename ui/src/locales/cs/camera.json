@@ -204,7 +204,9 @@
     "viewing": "Sleduješ",
     "weak": "Slabé připojení",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Tato kamera vyžaduje Mumcord 0.9.0"
+    "needsUpdate": "Tato kamera vyžaduje Mumcord 0.9.0",
+    "paused": "{{name}} pozastavil(a) kameru",
+    "pausedLabel": ", kamera pozastavena"
   },
   "tileMenu": {
     "options": "Možnosti pro {{name}}",

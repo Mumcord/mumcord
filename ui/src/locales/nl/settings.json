@@ -71,7 +71,8 @@
     "invalidInput": "Dat is mislukt: het bestand of wachtwoord is ongeldig.",
     "duplicateIdentity": "Deze identiteit staat al in je lijst.",
     "notFound": "Het bestand of item is niet gevonden.",
-    "generic": "Er is iets misgegaan. Probeer het opnieuw."
+    "generic": "Er is iets misgegaan. Probeer het opnieuw.",
+    "wrongPassword": "Het wachtwoord klopt niet. Controleer het en probeer het opnieuw."
   },
   "identity": {
     "export": "Exporteren…",
@@ -956,7 +957,10 @@
     "channel": "Updatekanaal",
     "channelHint": "Kies welke versies Mumcord aanbiedt. Release candidates zijn vroege builds van de volgende versie.",
     "channels": {
-      "stable": { "name": "Stabiel", "hint": "Alleen definitieve versies" },
+      "stable": {
+        "name": "Stabiel",
+        "hint": "Alleen definitieve versies"
+      },
       "releaseCandidates": {
         "name": "Release candidates",
         "hint": "Vroege builds van de volgende versie; kunnen bugs bevatten"

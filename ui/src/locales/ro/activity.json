@@ -17,7 +17,11 @@
     "watchPartyStopped": "a oprit vizionarea comună",
     "pluginActivityStarted": "a pornit {{plugin}}",
     "pluginActivityStopped": "a oprit {{plugin}}",
-    "pluginEvent": "„{{text}}”"
+    "pluginEvent": "„{{text}}”",
+    "kicked": "a fost dat afară",
+    "banned": "a fost interzis",
+    "kickedBy": "a fost dat afară de {{name}}",
+    "bannedBy": "a fost interzis de {{name}}"
   },
   "channel": "# {{channel}}",
   "plugin": "plugin",

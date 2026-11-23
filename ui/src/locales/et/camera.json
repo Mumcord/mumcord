@@ -190,7 +190,9 @@
     "viewing": "Vaatad",
     "weak": "Nõrk ühendus",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "See kaamera vajab Mumcord 0.9.0"
+    "needsUpdate": "See kaamera vajab Mumcord 0.9.0",
+    "paused": "{{name}} peatas kaamera",
+    "pausedLabel": ", kaamera peatatud"
   },
   "tileMenu": {
     "options": "Valikud: {{name}}",

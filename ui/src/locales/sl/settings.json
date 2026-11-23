@@ -75,7 +75,8 @@
     "invalidInput": "To ni uspelo: datoteka ali geslo ni veljavno.",
     "duplicateIdentity": "Ta identiteta je že na seznamu.",
     "notFound": "Datoteke ali elementa ni bilo mogoče najti.",
-    "generic": "Nekaj je šlo narobe. Poskusi znova."
+    "generic": "Nekaj je šlo narobe. Poskusi znova.",
+    "wrongPassword": "Geslo ni pravilno. Preverite ga in poskusite znova."
   },
   "identity": {
     "export": "Izvozi…",
@@ -968,7 +969,10 @@
     "channel": "Kanal posodobitev",
     "channelHint": "Izberi, katere izdaje ponuja Mumcord. Kandidati za izdajo so zgodnje različice naslednje različice.",
     "channels": {
-      "stable": { "name": "Stabilna", "hint": "Samo končne izdaje" },
+      "stable": {
+        "name": "Stabilna",
+        "hint": "Samo končne izdaje"
+      },
       "releaseCandidates": {
         "name": "Kandidati za izdajo",
         "hint": "Zgodnje različice naslednje različice; lahko vsebujejo napake"

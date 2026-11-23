@@ -190,7 +190,9 @@
     "viewing": "Гледаш",
     "weak": "Слаба връзка",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Тази камера изисква Mumcord 0.9.0"
+    "needsUpdate": "Тази камера изисква Mumcord 0.9.0",
+    "paused": "{{name}} постави камерата на пауза",
+    "pausedLabel": ", камерата е на пауза"
   },
   "tileMenu": {
     "options": "Опции за {{name}}",

@@ -197,7 +197,9 @@
     "viewing": "Visionnage",
     "weak": "Connexion faible",
     "format": "{{height}}p · {{codec}}",
-    "needsUpdate": "Cette caméra nécessite Mumcord 0.9.0"
+    "needsUpdate": "Cette caméra nécessite Mumcord 0.9.0",
+    "paused": "{{name}} a mis la caméra en pause",
+    "pausedLabel": ", caméra en pause"
   },
   "tileMenu": {
     "options": "Options pour {{name}}",

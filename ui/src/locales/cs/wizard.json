@@ -79,7 +79,8 @@
     "importInvalid": "Soubor se nepodařilo otevřít. Zkontroluj heslo a jestli jde o soubor identity .p12 nebo .pfx.",
     "importNotFound": "Soubor nebyl nalezen. Vyber ho prosím znovu.",
     "importIo": "Soubor se nepodařilo přečíst. Vyber ho prosím znovu.",
-    "pickFailed": "Výběr souboru se nepodařilo otevřít."
+    "pickFailed": "Výběr souboru se nepodařilo otevřít.",
+    "importWrongPassword": "Heslo není správné. Zkontrolujte ho a zkuste to znovu."
   },
   "mic": {
     "input": "Mikrofon",

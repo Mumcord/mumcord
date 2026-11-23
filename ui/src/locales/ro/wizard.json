@@ -79,7 +79,8 @@
     "importInvalid": "Fișierul nu a putut fi deschis. Verifică parola și dacă este un fișier de identitate .p12 sau .pfx.",
     "importNotFound": "Fișierul nu a fost găsit. Alege-l din nou.",
     "importIo": "Fișierul nu a putut fi citit. Alege-l din nou.",
-    "pickFailed": "Selectorul de fișiere nu a putut fi deschis."
+    "pickFailed": "Selectorul de fișiere nu a putut fi deschis.",
+    "importWrongPassword": "Parola nu este corectă. Verifică-o și încearcă din nou."
   },
   "mic": {
     "input": "Microfon",
