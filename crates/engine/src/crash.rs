@@ -550,8 +550,9 @@ fn drop_unexpected_reports(dir: &Path) {
 /// Records an exception of the app around the engine (a Kotlin or Swift crash) as a report of
 /// kind [`CrashKind::Foreign`], written before this returns, so the app can call it from its
 /// uncaught-exception handler right before the process ends. Exception messages can carry user
-/// data (names, paths, server addresses), so only the exception types stay: `cause` and every
-/// `Caused by:` / `Suppressed:` line lose the text after the first `": "`. The stack is cut to
+/// data (names, paths, server addresses), so only the exception types stay: `cause`, the first
+/// stack line and every `Caused by:` / `Suppressed:` line lose the text after the first `": "`,
+/// and other lines that are not frames (multi-line messages) are dropped. The stack is cut to
 /// 64 KiB; private folders are shortened as in every report. Fails when [`install`] has not run.
 pub fn record_foreign(cause: &str, stack: &str) -> io::Result<PathBuf> {
     let state = STATE
@@ -587,17 +588,22 @@ fn exception_type(line: &str) -> String {
 /// The stack without exception messages and within [`MAX_FOREIGN_STACK`].
 fn foreign_stack(stack: &str) -> String {
     let mut out = String::new();
-    for line in stack.lines() {
+    for (i, line) in stack.lines().enumerate() {
         let indent = &line[..line.len() - line.trim_start().len()];
         let trimmed = line.trim_start();
-        let kept = ["Caused by: ", "Suppressed: "]
+        let header = ["Caused by: ", "Suppressed: "]
             .iter()
-            .find_map(|prefix| {
-                trimmed
-                    .strip_prefix(prefix)
-                    .map(|rest| format!("{indent}{prefix}{}", exception_type(rest)))
-            })
-            .unwrap_or_else(|| line.to_owned());
+            .find_map(|prefix| trimmed.strip_prefix(prefix).map(|rest| (*prefix, rest)));
+        let kept = if is_frame(trimmed) {
+            line.to_owned()
+        } else if let Some((prefix, rest)) = header {
+            format!("{indent}{prefix}{}", exception_type(rest))
+        } else if i == 0 {
+            exception_type(trimmed)
+        } else {
+            // Any other line continues a multi-line exception message, which may carry user data.
+            continue;
+        };
         if out.len() + kept.len() + 1 > MAX_FOREIGN_STACK {
             out.push_str("[stack cut]\n");
             break;
@@ -606,6 +612,19 @@ fn foreign_stack(stack: &str) -> String {
         out.push('\n');
     }
     out
+}
+
+/// A stack frame of a JVM trace (`at …`, `... 3 more`) or of Apple's `callStackSymbols`
+/// (`0   Module   0x… symbol + 64`).
+fn is_frame(line: &str) -> bool {
+    if line.starts_with("at ") || line.starts_with("... ") {
+        return true;
+    }
+    let mut tokens = line.split_whitespace();
+    tokens
+        .next()
+        .is_some_and(|t| t.bytes().all(|b| b.is_ascii_digit()))
+        && tokens.any(|t| t.starts_with("0x"))
 }
 
 /// What goes into one report besides the version and the system details.
@@ -2079,6 +2098,30 @@ mod tests {
         assert!(kept.contains("Caused by: java.io.IOException\n"));
         assert!(kept.contains("\tSuppressed: java.lang.Error\n"));
         assert!(!kept.contains("secret") && !kept.contains("denied"));
+        assert!(kept.starts_with("java.lang.RuntimeException\n"));
+        assert!(!kept.contains("lea@example.org"));
+        let multi_line = "java.lang.IllegalStateException: no server\n\
+                          named lea@example.org\n\
+                          \tat a.B.c(B.kt:1)\n\
+                          Caused by: java.io.IOException: first\n\
+                          second /data/user/0/app.mumcord/files/x\n\
+                          \t... 1 more\n";
+        assert_eq!(
+            foreign_stack(multi_line),
+            "java.lang.IllegalStateException\n\
+             \tat a.B.c(B.kt:1)\n\
+             Caused by: java.io.IOException\n\
+             \t... 1 more\n"
+        );
+        let swift = "NSInvalidArgumentException: user lea@example.org\n\
+                     0   CoreFoundation   0x00000001804a2f0c __exceptionPreprocess + 164\n\
+                     1   Mumcord          0x0000000104a1c2f0 $s7Mumcord7SessionC7connectyyF + 64\n";
+        assert_eq!(
+            foreign_stack(swift),
+            "NSInvalidArgumentException\n\
+             0   CoreFoundation   0x00000001804a2f0c __exceptionPreprocess + 164\n\
+             1   Mumcord          0x0000000104a1c2f0 $s7Mumcord7SessionC7connectyyF + 64\n"
+        );
         let long = "\tat a.B.c(B.kt:1)\n".repeat(10_000);
         let cut = foreign_stack(&long);
         assert!(cut.len() <= MAX_FOREIGN_STACK + 32);
