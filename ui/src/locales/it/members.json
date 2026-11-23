@@ -108,8 +108,8 @@
     "talkingOne": "{{name}} sta parlando",
     "talkingTwo": "{{first}} e {{second}} stanno parlando",
     "talkingMore_one": "{{name}} e {{count}} altra persona stanno parlando",
-    "talkingMore_many": "{{name}} e altri {{count}} stanno parlando",
-    "talkingMore_other": "{{name}} e altri {{count}} stanno parlando"
+    "talkingMore_many": "{{name}} e altre {{count}} di persone stanno parlando",
+    "talkingMore_other": "{{name}} e altre {{count}} persone stanno parlando"
   },
   "revokeConsent": {
     "title": "Revocare il consenso alla chat per {{name}}?",
@@ -126,7 +126,7 @@
     "private": "I messaggi privati di {{name}} non vengono mostrati e non ti inviano notifiche.",
     "channelCollapsed": "I messaggi di canale di {{name}} sono compressi. Puoi comunque aprirli.",
     "channelHidden": "I messaggi di canale di {{name}} sono nascosti.",
-    "voice": "{{name}} è silenziato per te nella voce, sussurri inclusi.",
+    "voice": "{{name}} è silenziato per te nella chat vocale, sussurri inclusi.",
     "data": "Nessuna sincronizzazione della cronologia, nessun invito né altri dati Mumcord da {{name}}.",
     "followsCert": "Il blocco segue il certificato di {{name}}, quindi un nuovo nome non lo aggira.",
     "nameOnly": "{{name}} non ha un certificato, quindi il blocco vale solo per questo nome su {{server}}.",

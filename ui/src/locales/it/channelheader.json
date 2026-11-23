@@ -43,10 +43,10 @@
     "permission": {
       "enter": "Entrare",
       "speak": "Parlare",
-      "textMessage": "Testo",
+      "textMessage": "Scrivere messaggi",
       "whisper": "Sussurrare",
       "listen": "Ascoltare",
-      "write": "Scrivere ACL"
+      "write": "Modificare ACL"
     },
     "quality": "Limite di qualità",
     "qualityLimit": "Opus, fino a {{kbps}} kbit/s",

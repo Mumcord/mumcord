@@ -15,8 +15,9 @@ echo "libvpx $libvpx"
 version() { sed -n "s/^$1=//p" "$(dirname "$0")/$2"; }
 echo "svt-av1 $(version SVT_AV1_VERSION build-svt-av1.sh)"
 echo "dav1d $(version DAV1D_VERSION build-dav1d.sh)"
-# ONNX Runtime: the version pinned in the effects crate's download URLs (scripts/stage-onnxruntime.js).
-onnxruntime=$(sed -n 's#.*/onnxruntime/releases/download/v\([0-9.]*\)/.*#\1#p' "$(dirname "$0")/../crates/effects/build.rs" | sort -u)
+# ONNX Runtime: the version pinned in the effects crate's download URL (Microsoft's NuGet
+# package; scripts/stage-onnxruntime.js copies the library it carries).
+onnxruntime=$(sed -n 's#.*/microsoft\.ml\.onnxruntime/\([0-9.]*\)/.*#\1#p' "$(dirname "$0")/../crates/effects/build.rs" | sort -u)
 [ "$(printf '%s\n' "$onnxruntime" | wc -l)" -eq 1 ] && [ -n "$onnxruntime" ] || { echo "no single ONNX Runtime version in crates/effects/build.rs" >&2; exit 1; }
 echo "onnxruntime $onnxruntime"
 # macOS has no hardware encoder, so it gets none of the hardware encoder interfaces; the VA-API

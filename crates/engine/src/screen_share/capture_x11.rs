@@ -7,6 +7,10 @@
 //! The sound is the desktop's through PipeWire, as on Wayland (FR-7.81): with the whole screen
 //! shared there is no window whose app could be asked for. PipeWire is Linux's sound server, so
 //! a share on the BSDs carries no sound.
+//!
+//! The picture is scaled into the encoder's box by the shared capture conversion, which reads
+//! each source pixel once: the whole screen is read at the source's size every frame, so a
+//! full-size intermediate would cost more than the encode.
 
 use hwcodec::I420Frame;
 use x11rb::connection::Connection;
@@ -14,16 +18,11 @@ use x11rb::protocol::xproto::{ConnectionExt, ImageFormat, ImageOrder};
 use x11rb::rust_connection::RustConnection;
 
 use super::capture::CaptureSource;
+use super::convert::bgra_to_i420;
 use super::signal::ShareKind;
 #[cfg(target_os = "linux")]
 use super::sound::pick;
 use super::sound::{SoundOutcome, SoundRequest};
-#[cfg(target_os = "freebsd")]
-mod freebsd;
-#[cfg(target_os = "freebsd")]
-use freebsd::bgra_to_i420;
-#[cfg(not(target_os = "freebsd"))]
-use hwcodec::convert::bgra_to_i420;
 
 /// Why the screen cannot be captured.
 #[derive(Debug, thiserror::Error)]

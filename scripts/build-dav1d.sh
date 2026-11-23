@@ -14,7 +14,7 @@
 # screen sharing never sends 10-bit video.
 set -euo pipefail
 
-DAV1D_VERSION=1.5.4
+DAV1D_VERSION=1.5.5
 # Matches the oldest macOS that Rust's aarch64 target supports, so the linker does not warn
 # about objects built for a newer system.
 MACOS_DEPLOYMENT_TARGET=11.0

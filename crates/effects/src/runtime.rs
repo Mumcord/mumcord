@@ -89,6 +89,13 @@ mod tests {
     #[cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))]
     #[test]
     fn loads_the_runtime_the_build_fetched_once() {
+        // A failed download is only a build warning (the app then runs without effects), so
+        // name it here; otherwise this test just says "the library is missing".
+        assert!(
+            !env!("MUMCORD_ORT_BUILD_DYLIB").is_empty(),
+            "the build could not fetch ONNX Runtime; see the `ONNX Runtime not fetched` warning \
+             from mumcord-effects' build script for the URL and the reason"
+        );
         super::availability().expect("bundled runtime loads");
         super::availability().expect("runtime stays available");
     }

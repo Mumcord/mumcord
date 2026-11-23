@@ -27,7 +27,7 @@ case "$name" in
   curl | lipo) ;;
   tar)
     dest=${@: -1}
-    mkdir -p "$dest/"{libvpx-1.15.2,SVT-AV1-v4.2.0,dav1d-1.5.4,libvpl-2.17.0,nv-codec-headers-n13.0.19.0/include/ffnvcodec,amf-headers-v1.5.3/AMF,libva-2.22.0/va/drm}
+    mkdir -p "$dest/"{libvpx-1.15.2,SVT-AV1-v4.2.0,dav1d-1.5.5,libvpl-2.17.0,nv-codec-headers-n13.0.19.0/include/ffnvcodec,amf-headers-v1.5.3/AMF,libva-2.22.0/va/drm}
     va="$dest/libva-2.22.0/va"
     touch "$va/"{va.h,va_backend.h,va_backend_prot.h,va_backend_vpp.h,va_compat.h,va_dec_test.h,va_drmcommon.h,va_enc_test.h,va_fei_test.h,va_str.h,va_tpi.h,va_prot.h,va_vpp.h,drm/va_drm.h,va_version.h.in}
     printf 'va_api_major_version = 1\nva_api_minor_version = 22\nva_api_micro_version = 0\n' > "$va/../meson.build"
